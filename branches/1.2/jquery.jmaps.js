@@ -26,7 +26,12 @@
  */
 
 (function($) {
-	function searchAddress(jmap, address, GGeocoder, settings) {
+	/* function searchAddress(jmap, address, settings)
+	 * This function is an internal plugin method that returns a GLatLng that can be passed
+	 * to a Google map.
+	 */
+	function searchAddress(jmap, address, settings) {
+		GGeocoder = new GClientGeocoder();
 		GGeocoder.getLatLng(address, function(point){
 			if (!point) {
 				alert(address + " not found");
@@ -34,18 +39,23 @@
 				jmap.setCenter(point,settings.zoom);
 				var marker = new GMarker(point, {draggable: true});
 				jmap.addOverlay(marker);
-				marker.openInfoWindowHtml("Latitude: " + mylocation.lat() + "<br />Longitude: " + mylocation.lng());
+				pointlocation = marker.getPoint();
+				marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());
 				GEvent.addListener(marker, "dragend", function(){
 					mylocation = marker.getPoint();
-					marker.openInfoWindowHtml("Latitude: " + mylocation.lat() + "<br />Longitude: " + mylocation.lng());			
+					marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());			
 				});
 			}
 	});
 };
 
 $.fn.extend({
+	/* jmap: function(settings)
+	 * The constructor method
+	 * Example: $().jmap();
+	 */
 	jmap: function(settings) {
-		var version = "0.1";
+		var version = "1.2";
 		
 		/* Default Settings*/	
 		settings = jQuery.extend({
@@ -66,7 +76,7 @@ $.fn.extend({
 		{
 			return this.each(function(){
 				var jmap = this.GMap2 = new GMap2(this);
-				GGeocoder = new GClientGeocoder();
+				
 				
 				this.GMap2.setCenter(new GLatLng(settings.center[0],settings.center[1]),settings.zoom,settings.maptype);
 				switch(settings.control)
@@ -105,22 +115,26 @@ $.fn.extend({
 			
 				/* Seach for the lat & lng of our address*/
 				jQuery(settings.searchbutton).bind('click', function(){
-					searchAddress(jmap, jQuery(settings.searchfield).attr('value'), GGeocoder, settings);
+					searchAddress(jmap, jQuery(settings.searchfield).attr('value'), settings);
 				});
 
 				jQuery(document).unload(function(){ GUnload(); });
 			});
 		}
 	},
-    
+	/* myMap: function()
+	 * Returns a GMap2 object, so Google's map API is exposed to the user
+	 * Example: $().myMap().setCenter(...);
+	 */
 	myMap: function() {
-		return this[0].GMap2;
-		
+		return this[0].GMap2;	
 	},
-    
+	/* addPoint: function()
+	 * Returns a marker to be overlayed on the Google map
+	 * Example: $().addPoint(...);
+	 */
 	addPoint: function(pointlat, pointlng, pointhtml, isdraggable, removable) {
 		var jmap = this[0].GMap2;
-		console.log(jmap);
 		var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );
 		GEvent.addListener(marker, "click", function(){
 			marker.openInfoWindowHtml(pointhtml);
@@ -132,16 +146,27 @@ $.fn.extend({
 		}
 		return jmap.addOverlay(marker);
 	},
+	/* addPoly: function(poly)
+	 * Takes an array of GLatLng points, converts it to a vector Polyline to display on the map
+	 * Example: $().addPoly(...);
+	 */
 	addPoly: function (poly) {
 		var jmap = this[0].GMap2;
 		return jmap.addOverlay(poly);
 	},
-	/* FIXME: KML File not rendering*/
+	/* addKml: function()
+	 * Takes a KML file and renders it to the map.
+	 * Example: $().addPoint(...);
+	 */
 	addKml: function (kmlfile) {
 		var jmap = this[0].GMap2;
 		var geoXml = new GGeoXml(kmlfile);
 		return jmap.addOverlay(geoXml);
 	},
+	/* directions: function(query, panel)
+	 * Takes a Direction query and returns directions for map.  Optional panel for text information
+	 * Example: $().directions(...);
+	 */
 	directions: function(query,panel) {
 		var jmap = this[0].GMap2;
 		var dirpanel = document.getElementById(panel);
