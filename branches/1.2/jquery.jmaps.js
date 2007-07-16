@@ -1,12 +1,15 @@
-/*
- * jQuery Maps (jMaps) - A jQuery plugin for Google Maps API
+/* jQuery Maps (jMaps) - A jQuery plugin for Google Maps API
  * Author: Tane Piper (digitalspaghetti@gmail.com) 
  * With special thanks Dave Cardwell (who helped on getting this plugin to work).
  * Website: http://code.google.com/p/gmapp/
  * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
- * For Google Maps API see http://www.google.com/apis/maps/
+ * This plugin is not affiliated with Google.  For Google Maps API and T&C see http://www.google.com/apis/maps/
  * 
  * === Changelog ===
+ * Version 1.2 (In Development)
+ * Moved GClientGeocoder into searchAddress method
+ * Fixed bug in searchAddress method regarding getPoint().
+ * 
  * Version 1.1 (16/07/2007)
  * Changed name to remove Google from main name - namespace now .jmap.
  * Added additional options:
@@ -24,7 +27,6 @@
  * Add points to map.
  * Takes address or postcode, Geocodes and centers map.  Also creates a draggable marker.
  */
-
 (function($) {
 	/* function searchAddress(jmap, address, settings)
 	 * This function is an internal plugin method that returns a GLatLng that can be passed
@@ -48,7 +50,6 @@
 			}
 	});
 };
-
 $.fn.extend({
 	/* jmap: function(settings)
 	 * The constructor method
@@ -56,7 +57,6 @@ $.fn.extend({
 	 */
 	jmap: function(settings) {
 		var version = "1.2";
-		
 		/* Default Settings*/	
 		settings = jQuery.extend({
 			maptype: G_HYBRID_TYPE,
@@ -71,13 +71,10 @@ $.fn.extend({
 			searchfield: "#Address",
 			searchbutton: "#findaddress"
 		},settings);
-		
 		if (GBrowserIsCompatible())
 		{
 			return this.each(function(){
 				var jmap = this.GMap2 = new GMap2(this);
-				
-				
 				this.GMap2.setCenter(new GLatLng(settings.center[0],settings.center[1]),settings.zoom,settings.maptype);
 				switch(settings.control)
 				{
@@ -92,14 +89,12 @@ $.fn.extend({
 					default:
 						this.GMap2.addControl(new GSmallMapControl());
 				}
-			
 				if (settings.showtype == true){
 					this.GMap2.addControl(new GMapTypeControl());
 				}
 				if (settings.showoverview == true){
 					this.GMap2.addControl(new GOverviewMapControl());
 				}
-			
 				if (settings.scrollzoom == true) {
 					/* Off by default */
 					this.GMap2.enableScrollWheelZoom();
@@ -112,12 +107,11 @@ $.fn.extend({
 					/* On by default */
 					this.GMap2.disableDragging();
 				}
-			
 				/* Seach for the lat & lng of our address*/
 				jQuery(settings.searchbutton).bind('click', function(){
 					searchAddress(jmap, jQuery(settings.searchfield).attr('value'), settings);
 				});
-
+				/* On document unload, clean unload Google API*/
 				jQuery(document).unload(function(){ GUnload(); });
 			});
 		}
@@ -173,6 +167,5 @@ $.fn.extend({
 		directions = new GDirections(jmap, dirpanel);
 		directions.load(query);
 	}
-
 });
 })(jQuery);
