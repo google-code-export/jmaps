@@ -12,6 +12,7 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		<script src="http://maps.google.com/maps?file=api&v=2&key=ABQIAAAApCYnM8S-TSRBhQk16Ynr4BQsdKsyZnhdiIFVYLirST5eeJJrrBSLEOe2KFlwraCMKFXFl41xy8sfMw" type="text/javascript"></script>
 		<script src="http://www.google.com/uds/api?file=uds.js&v=1.0&key=ABQIAAAApCYnM8S-TSRBhQk16Ynr4BQsdKsyZnhdiIFVYLirST5eeJJrrBSLEOe2KFlwraCMKFXFl41xy8sfMw" type="text/javascript"></script>
 		<script src="jquery.js" type="text/javascript"></script>
+		<script src="chili-1.7.pack.js" type="text/javascript"></script>
 		<script src="jquery.jmaps.js" type="text/javascript"></script>
 
 		<script type="text/javascript">
@@ -62,7 +63,22 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 	<style type="text/css">
 	*, body { margin: 0, 10px; padding: 0; }
 	p, ul { margin:10px; padding:10px;}
-	code, pre {width: 80%; text-align:left; margin:0 auto; padding:1px; overflow:hide}
+	pre {width: 80%; text-align:left; margin:0 auto; padding:1px; overflow:hide}
+	.jscom, .mix htcom   { color: #4040c2; }
+	.com      { color: green; }
+	.regexp   { color: maroon; }
+	.string   { color: teal; }
+	.keywords { color: blue; }
+	.global   { color: #008; }
+	.numbers  { color: #880; }
+	.comm     { color: green; }
+	.tag      { color: blue; }
+	.entity   { color: blue; }
+	.string   { color: teal; }
+	.aname    { color: maroon; }
+	.avalue   { color: maroon; }
+	.jquery   { color: #00a; }
+	.plugin   { color: red; }
 	</style>
 	</head>
 	<body>
@@ -124,11 +140,13 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 	</p>
 	<p>
 		<a class="showcode" href="#jsinclude">Show Code</a>
-		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="jsinclude">
+		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="jsinclude"
+		<code class="mix">
 		&lt;script src="http://maps.google.com/maps?file=api&v=2&key=YOURKEY"type="text/javascript">&lt;/script>
  		&lt;script src="http://www.google.com/uds/api?file=uds.js&v=1.0&key=YOURKEY"type="text/javascript">&lt;/script>
  		&lt;script src="jquery.js"type="text/javascript">&lt;/script>
  		&lt;script src="jquery.jmap.js"type="text/javascript">&lt;/script>
+		</code>
 		</pre>
 	</p>
 	<a name="example"><h2>Examples</h2></a>
@@ -139,12 +157,14 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 	<p>
 		<a class="showcode" href="#basicpage">Show Code</a>
 		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="basicpage">
+		<code class="mix">
 			&lt;div id="gmap" style="float:left;width:800px;height:400px;">&lt;/div>
 			&lt;div style="float:left;width:15%">
 				&lt;strong>Find Address&lt;/strong>
 				&lt;input type="text" id="Address" />
 				&lt;input type="submit" id="findaddress" />
 			&lt;/div>
+		</code>
 		</pre>
 	</p>
 	
@@ -160,15 +180,18 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		<h4>Basic Usage</h4>
 		<a class="showcode" href="#basicinit">Show Code</a>
 		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="basicinit">
+		<code class="mix">
 			$('document').ready(function(){ 
 				$('#gmap').jmap();
 			});
+		</code>
 		</pre>
 	</p>
 	<p>
 		<h4>With full options.  Note these are default</h4>
 		<a class="showcode" href="#fulloptions">Show Code</a>
 		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="fulloptions">
+		<code class="mix">
 			$('document').ready(function(){ 
 				$('#gmap').jmap({
 					maptype: G_HYBRID_TYPE,
@@ -185,6 +208,7 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 				},settings);
 				});
 			});
+		</code>
 		</pre>
 	</p>
 	<p>
@@ -194,7 +218,9 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 	<p>
 		<a class="showcode" href="#addpoint">Show Code</a>
 		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="addpoint">
+		<code class="mix">
 				$('#gmap').addPoint('55.948286','-3.200111', 'Point1', false, false);
+		</code>
 		</pre>
 	</p>
 	<ul>
@@ -211,6 +237,7 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 	<p>
 		<a class="showcode" href="#polyline">Show Code</a>
 		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="polyline">
+		<code class="mix">
 				&lt;script type="text/javascript">
 					var polyline = new GPolyline([
     						new GLatLng(55.958387, -3.162367),
@@ -218,6 +245,7 @@ xmlns:v="urn:schemas-microsoft-com:vml">
     						new GLatLng(55.9447781445014, -3.21624755859375)
 					], "#FF0000", 10,1);
 				&lt;/script>
+		</code>
 		</pre>
 	</p>
 	<p>
@@ -225,9 +253,11 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 	<p>
 		<a class="showcode" href="#renderpolyline">Show Code</a>
 		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="renderpolyline">
+		<code class="mix">
 				$('a.addpoly').bind('click', function(){
 					$('#gmap').addPoly(polyline);
 				});
+		</code>
 		</pre>
 	</p>
 	<h3>KML Files</h3>
@@ -237,8 +267,10 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 	<p>
 		<a class="showcode" href="#renderkml">Show Code</a>
 		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="renderkml">
+		<code class="mix">
 				$("#gmap2").addKml("http://mapgadgets.googlepages.com/cta.kml");	
 				$("#gmap2").myMap().setCenter(new GLatLng(41.88414, -87.63238), 10);
+		</code>
 		</pre>
 	</p>
 	<h3>Driving Directions</h3>
@@ -248,7 +280,9 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 	<p>
 		<a class="showcode" href="#directions">Show Code</a>
 		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="directions">
+		<code class="mix">
 				$("#gmap").directions("from: New York to: Toronto" , "directions");
+		</code>
 		</pre>
 	</p>
 	
