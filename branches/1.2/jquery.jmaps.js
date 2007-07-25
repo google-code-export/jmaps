@@ -6,7 +6,10 @@
  * This plugin is not affiliated with Google.  For Google Maps API and T&C see http://www.google.com/apis/maps/
  * 
  * === Changelog ===
- * Version 1.2 (In Development)
+ * Version 1.3
+ * 
+ * 
+ * Version 1.2 (25/07/2007)
  * Moved GClientGeocoder into searchAddress method
  * Fixed bug in searchAddress method regarding getPoint().
  * 
@@ -56,9 +59,10 @@ $.fn.extend({
 	 * Example: $().jmap();
 	 */
 	jmap: function(settings) {
-		var version = "1.2";
+		var version = "1.3";
 		/* Default Settings*/	
 		settings = jQuery.extend({
+			mapversion: "google",
 			maptype: G_HYBRID_TYPE,
 			center: [55.958858,-3.162302],
 			zoom: 12,
@@ -71,81 +75,114 @@ $.fn.extend({
 			searchfield: "#Address",
 			searchbutton: "#findaddress"
 		},settings);
-		if (GBrowserIsCompatible())
-		{
-			return this.each(function(){
-				var jmap = this.GMap2 = new GMap2(this);
-				this.GMap2.setCenter(new GLatLng(settings.center[0],settings.center[1]),settings.zoom,settings.maptype);
-				switch(settings.control)
-				{
-					case "small":
-						this.GMap2.addControl(new GSmallMapControl());
-						break;
-					case "large":
-						this.GMap2.addControl(new GLargeMapControl());
-						break;
-					case "none":
-						break;
-					default:
-						this.GMap2.addControl(new GSmallMapControl());
+		
+		return this.each(function(){
+			switch(settings.mapversion)
+			{
+				case "yahoo":
+					var jmap = this.jMap = new YMap(this);
+					jmap.setMapType(settings.maptype);
+					jmap.drawZoomAndCenter(new YCoordPoint(settings.center[0],settings.center[1]), settings.zoom);
+					
+					if (settings.showtype == true){
+						jmap.addTypeControl();
+					}
+					break;
+					
+				case "mslive":
+					alert('Microsoft Live Maps are currently not supported but planned for version 1.4')
+					break;
+					
+				default:	
+					var jmap = this.jMap = new GMap2(this);
+					jmap.setCenter(new GLatLng(settings.center[0],settings.center[1]),settings.zoom,settings.maptype);
+					
+					switch(settings.control)
+					{
+						case "small":
+							jmap.addControl(new GSmallMapControl());
+							break;
+						case "large":
+							jmap.addControl(new GLargeMapControl());
+							break;
+						case "none":
+							break;
+						default:
+							jmap.addControl(new GSmallMapControl());
+					}
+					if (settings.showtype == true){
+						jmap.addControl(new GMapTypeControl());
+					}
+					if (settings.showoverview == true){
+						jmap.addControl(new GOverviewMapControl());
+					}
+					if (settings.scrollzoom == true) {
+						/* Off by default */
+						jmap.enableScrollWheelZoom();
+					}
+					if (settings.smoothzoom == true) {
+						/* Off by default*/
+						jmap.enableContinuousZoom();
+					}
+					if (settings.dragging == false) {
+						/* On by default */
+						jmap.disableDragging();
 				}
-				if (settings.showtype == true){
-					this.GMap2.addControl(new GMapTypeControl());
-				}
-				if (settings.showoverview == true){
-					this.GMap2.addControl(new GOverviewMapControl());
-				}
-				if (settings.scrollzoom == true) {
-					/* Off by default */
-					this.GMap2.enableScrollWheelZoom();
-				}
-				if (settings.smoothzoom == true) {
-					/* Off by default*/
-					this.GMap2.enableContinuousZoom();
-				}
-				if (settings.dragging == false) {
-					/* On by default */
-					this.GMap2.disableDragging();
-				}
-				/* Seach for the lat & lng of our address*/
-				jQuery(settings.searchbutton).bind('click', function(){
-					searchAddress(jmap, jQuery(settings.searchfield).attr('value'), settings);
-				});
-				/* On document unload, clean unload Google API*/
-				jQuery(document).unload(function(){ GUnload(); });
+			}
+				
+			/* Seach for the lat & lng of our address*/
+			jQuery(settings.searchbutton).bind('click', function(){
+				searchAddress(jmap, jQuery(settings.searchfield).attr('value'), settings);
 			});
-		}
-	},
+			/* On document unload, clean unload Google API*/
+			jQuery(document).unload(function(){ GUnload(); });
+		});
+		},
 	/* myMap: function()
 	 * Returns a GMap2 object, so Google's map API is exposed to the user
 	 * Example: $().myMap().setCenter(...);
 	 */
 	myMap: function() {
-		return this[0].GMap2;	
+		return this[0].jMap;	
 	},
 	/* addPoint: function()
 	 * Returns a marker to be overlayed on the Google map
 	 * Example: $().addPoint(...);
 	 */
-	addPoint: function(pointlat, pointlng, pointhtml, isdraggable, removable) {
-		var jmap = this[0].GMap2;
-		var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );
-		GEvent.addListener(marker, "click", function(){
-			marker.openInfoWindowHtml(pointhtml);
-		});
-		if (removable == true) {
-			GEvent.addListener(marker, "dblclick", function(){
-				return jmap.removeOverlay(marker);
-			});
+	addPoint: function(pointlat, pointlng, pointhtml, isdraggable, removable, settings) {
+		switch(settings.mapversion)
+		{
+				case "yahoo":
+					var jmap = this[0].jMap;
+					var marker = new YGeoPoint(pointlat, pointlng);
+					jmap.addMarker(marker);
+					break;
+					
+				case "mslive":
+					alert('Microsoft Live Maps are currently not supported but planned for version 1.4')
+					break;
+					
+				default:
+					var jmap = this[0].jMap;
+					var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );
+					GEvent.addListener(marker, "click", function(){
+						marker.openInfoWindowHtml(pointhtml);
+					});
+					if (removable == true) {
+						GEvent.addListener(marker, "dblclick", function(){
+						return jmap.removeOverlay(marker);
+						});
+					}
+					return jmap.addOverlay(marker);
+					
 		}
-		return jmap.addOverlay(marker);
 	},
 	/* addPoly: function(poly)
 	 * Takes an array of GLatLng points, converts it to a vector Polyline to display on the map
 	 * Example: $().addPoly(...);
 	 */
 	addPoly: function (poly) {
-		var jmap = this[0].GMap2;
+		var jmap = this[0].jMap;
 		return jmap.addOverlay(poly);
 	},
 	/* addKml: function()
@@ -153,7 +190,7 @@ $.fn.extend({
 	 * Example: $().addPoint(...);
 	 */
 	addKml: function (kmlfile) {
-		var jmap = this[0].GMap2;
+		var jmap = this[0].jMap;
 		var geoXml = new GGeoXml(kmlfile);
 		return jmap.addOverlay(geoXml);
 	},
@@ -162,7 +199,7 @@ $.fn.extend({
 	 * Example: $().directions(...);
 	 */
 	directions: function(query,panel) {
-		var jmap = this[0].GMap2;
+		var jmap = this[0].jMap;
 		var dirpanel = document.getElementById(panel);
 		directions = new GDirections(jmap, dirpanel);
 		directions.load(query);
