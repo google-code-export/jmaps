@@ -8,7 +8,7 @@
  * For Yahoo! Maps API and T&C see http://developer.yahoo.com/maps/
  * 
  * === Changelog ===
- * Version 1.3
+ * Version 1.3 (in development)
  * Added support for creating Yahoo! Maps, can create Map, Satallite or Hybrid.  Check out available options below
  * Added support for creating points on Yahoo! maps.
  * Added support for creating Polylines on Yahoo! maps.

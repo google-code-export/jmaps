@@ -19,20 +19,11 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		<script type="text/javascript">
 			$('document').ready(function(){
 				$("#gmap").jmap();
-				$("#gmap2").jmap({mapversion: "yahoo", maptype: YAHOO_MAP_HYB});
+				$("#gmap2").jmap({provider: "yahoo"});
 
 			$("a.showcode").bind("click", function(){
 				var showdiv = $(this).attr("href");
 				$(showdiv).toggle("fast");
-				return false;
-			});
-			
-			$("#getDirections").bind("click", function(){
-				var from = $("#from").attr('value');
-				var to = $("#to").attr('value');
-				$("#gmap").directions("from: " + from + " to: " + to, "mydirections");	
-				$("#from").attr('value', to);
-				$("#to").attr('value', '');
 				return false;
 			});
 		});
@@ -277,12 +268,9 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		<div id="mydirections" style="max-height:250px; overflow:auto;"></div>
 	</div>
 	<br style="clear:both;" />
-	<h2><span style="color:red">New</span>: Polylines & Polygons</h2>
+	<h2><span style="color:red">New</span>: Yahoo! Maps Support</h2>
 	<div id="gmap2" style="float:left;width:800px;height:400px;"></div>
 	<div style="float:left;width:15%">
-		<a href="#" class="addline">Add New Polyline</a>
-		<br />
-		<a href="#" class="add-kml">Add KML File</a>
 	</div>
 	<br style="clear:both;" />
 	<a name="download"><h2>Download</h2></a>
@@ -290,6 +278,10 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		<ul>
 		<li><a href="http://jmaps.googlecode.com/files/jquery.jmaps.js">Unpacked Version</a></li>
 		<li><a href="http://jmaps.googlecode.com/files/jquery.jmaps.packed.js">Packed Version</a></li>
+		</ul>
+		<strong>jQuery Google Map Application Version 1.3 (Development)</strong>
+		<ul>
+		<li><a href="http://jmaps.googlecode.com/files/jquery.jmaps.development.js">Unpacked Version</a></li>
 		</ul>
 	</body>
 </html>
