@@ -43,10 +43,10 @@
 	 * to a Google map.
 	 */
 	function searchAddress(jmap, address, settings) {
-		
+		// Yahoo Maps
 		if (jmap._mapType) {
 			alert('JMap does not yet support the Yahoo! Geocoder.');
-		} else if (jmap.i.Au) {
+		} else if (jmap.i.Au) { //Google Maps
 			GGeocoder = new GClientGeocoder();
 			GGeocoder.getLatLng(address, function(point){
 				if (!point) {
@@ -75,10 +75,7 @@
 		// Yahoo Maps
 		if (jmap._mapType) {
 			alert('Yahoo Directions support not yet added')	;
-		}
-		
-		// Google Maps
-		if (jmap.i.Au) {
+		} else if (jmap.i.Au) { //Google Maps
 			var dirpanel = document.getElementById(panel);
 			directions = new GDirections(jmap, dirpanel);
 			directions.load(query);
@@ -255,10 +252,7 @@
 				});
 			}*/
 			jmap.addOverlay(marker);	// Add marker to map
-		}
-		
-		// Google Maps	
-		if (jmap.i.Au) {
+		} else if (jmap.i.Au) { // Google Maps
 			var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );
 			GEvent.addListener(marker, "click", function(){
 				marker.openInfoWindowHtml(pointhtml);
@@ -280,9 +274,7 @@
 		// Yahoo Maps
 		if (jmap._mapType) {
 			return	jmap.addOverlay(poly, colour, width, alpha);
-		}
-		// Google Maps
-		if (jmap.i.Au) {
+		} else if (jmap.i.Au) { // Google Maps	
 			return jmap.addOverlay(poly);
 		}
 	},
@@ -296,9 +288,7 @@
 		if (jmap._mapType) {
 			var geoXml = new YGeoRSS(rssfile);
 			return jmap.addOverlay(geoXml);
-		}
-		// Google Maps
-		if (jmap.i.Au) {
+		} else if (jmap.i.Au) {  // Google Maps	
 			var geoXml = new GGeoXml(rssfile);
 			return jmap.addOverlay(geoXml);
 		}
