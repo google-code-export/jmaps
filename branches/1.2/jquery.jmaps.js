@@ -1,15 +1,20 @@
-/* jQuery Maps (jMaps) - A jQuery plugin for Google Maps API
+/* jQuery Maps (jmaps) - A jQuery plugin for Google Maps API
  * Author: Tane Piper (digitalspaghetti@gmail.com) 
- * With special thanks Dave Cardwell (who helped on getting this plugin to work).
+ * With special thanks Dave Cardwell (who helped on getting the first version of this plugin to work).
  * Website: http://code.google.com/p/gmapp/
  * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
- * This plugin is not affiliated with Google.  For Google Maps API and T&C see http://www.google.com/apis/maps/
+ * This plugin is not affiliated with Google or Yahoo.  
+ * For Google Maps API and T&C see http://www.google.com/apis/maps/
+ * For Yahoo! Maps API and T&C see http://developer.yahoo.com/maps/
  * 
  * === Changelog ===
  * Version 1.3
  * Added support for creating Yahoo! Maps, can create Map, Satallite or Hybrid.  Check out available options below
  * Added support for creating points on Yahoo! maps.
  * Added support for creating Polylines on Yahoo! maps.
+ * Added support for GeoRSS files on both Yahoo! and Google maps, as well as existing KML support for Google, method
+ * name was changed from .addKml to .addRss
+ * Moved directions search out of main namespace, now function that is called from within plugin by providing fields
  * 
  * Version 1.2 (25/07/2007)
  * Moved GClientGeocoder into searchAddress method
@@ -38,24 +43,49 @@
 	 * to a Google map.
 	 */
 	function searchAddress(jmap, address, settings) {
-		GGeocoder = new GClientGeocoder();
-		GGeocoder.getLatLng(address, function(point){
-			if (!point) {
-				alert(address + " not found");
-			} else {
-				jmap.setCenter(point,settings.zoom);
-				var marker = new GMarker(point, {draggable: true});
-				jmap.addOverlay(marker);
-				pointlocation = marker.getPoint();
-				marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());
-				GEvent.addListener(marker, "dragend", function(){
-					mylocation = marker.getPoint();
-					marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());			
-				});
-			}
-	});
-};
-$.fn.extend({
+		
+		if (jmap._mapType) {
+			alert('Yahoo Maps Geocoding not yet supported');
+		}
+		
+		if (jmap.i.Au) {
+			GGeocoder = new GClientGeocoder();
+			GGeocoder.getLatLng(address, function(point){
+				if (!point) {
+					alert(address + " not found");
+				} else {
+					jmap.setCenter(point,settings.zoom);
+					var marker = new GMarker(point, {draggable: true});
+					jmap.addOverlay(marker);
+					pointlocation = marker.getPoint();
+					marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());
+					GEvent.addListener(marker, "dragend", function(){
+						mylocation = marker.getPoint();
+						marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());			
+					});
+				}
+			});
+		}	
+	}
+	
+	/* directions: function(map,query, panel)
+	 * Takes a Direction query and returns directions for map.  Optional panel for text information
+	 */
+	function searchDirections(jmap,query,panel) {
+		// Yahoo Maps
+		if (jmap._mapType) {
+			alert('Yahoo Directions support not yet added')	;
+		}
+		
+		// Google Maps
+		if (jmap.i.Au) {
+			var dirpanel = document.getElementById(panel);
+			directions = new GDirections(jmap, dirpanel);
+			directions.load(query);
+		}
+	}
+
+	$.fn.extend({
 	/* jmap: function(settings)
 	 * The constructor method
 	 * Example: $().jmap();
@@ -78,7 +108,11 @@ $.fn.extend({
 			scrollzoom: true,		// G + Y
 			smoothzoom: true,		// G
 			searchfield: "#Address",
-			searchbutton: "#findaddress"
+			searchbutton: "#findaddress",
+			directionsto: "#to",
+			directionsfrom: "#from",
+			directionsfind: "#getDirections",
+			directionspanel: "myDirections"
 		},settings);
 		
 		return this.each(function(){
@@ -99,7 +133,6 @@ $.fn.extend({
 					}
 					jmap.setMapType(loadmap);
 					jmap.drawZoomAndCenter(new YGeoPoint(settings.center[0],settings.center[1]), settings.zoom);
-					console.log(jmap);
 					if (settings.showtype == true){
 						jmap.addTypeControl();	// Type of map Control
 					}
@@ -180,13 +213,23 @@ $.fn.extend({
 			jQuery(settings.searchbutton).bind('click', function(){
 				searchAddress(jmap, jQuery(settings.searchfield).attr('value'), settings);
 			});
+			/* Search for Directions */
+			jQuery(settings.directionsfind).bind("click", function(){
+				var from = $(settings.directionsfrom).attr('value');
+				var to = $(settings.directionsto).attr('value');
+				searchDirections(jmap, "from: " + from + " to: " + to, settings.directionspanel);	
+				$(settings.directionsfrom).attr('value', to);
+				$(settings.directionsto).attr('value', '');
+				return false;
+			});
 			/* On document unload, clean unload Google API*/
 			jQuery(document).unload(function(){ GUnload(); });
 		});
 		},
 	/* myMap: function()
-	 * Returns a GMap2 object, so Google's map API is exposed to the user
-	 * Example: $().myMap().setCenter(...);
+	 * Returns a map object from the API, so it's available to the user
+	 * Example: $().myMap().setCenter(...) for Google;
+	 * Example: $().myMap().drawZoomAndCenter(...) for Yahoo;
 	 */
 	myMap: function() {
 		return this[0].jMap;	
@@ -196,9 +239,9 @@ $.fn.extend({
 	 * Example: $().addPoint(...);
 	 */
 	addPoint: function(pointlat, pointlng, pointhtml, isdraggable, removable) {
+		var jmap = this[0].jMap;
 		// Yahoo Maps
-		if (this[0].jMap._mapType) {
-			var jmap = this[0].jMap;
+		if (jmap._mapType) {			
 			var marker = new YMarker(new YGeoPoint(pointlat, pointlng));	// Create the Yahoo marker type
 			YEvent.Capture(marker, EventsList.MouseClick, function(){		// Add mouseclick to open HTML
 				marker.openSmartWindow(pointhtml);
@@ -213,8 +256,7 @@ $.fn.extend({
 		}
 		
 		// Google Maps	
-		if (this[0].jMap.i.Au) {
-			var jmap = this[0].jMap;
+		if (jmap.i.Au) {
 			var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );
 			GEvent.addListener(marker, "click", function(){
 				marker.openInfoWindowHtml(pointhtml);
@@ -234,32 +276,31 @@ $.fn.extend({
 	addPoly: function (poly, colour, width, alpha) {
 		var jmap = this[0].jMap;
 		// Yahoo Maps
-		if (this[0].jMap._mapType) {
+		if (jmap._mapType) {
 			return	jmap.addOverlay(poly, colour, width, alpha);
 		}
 		// Google Maps
-		if (this[0].jMap.i.Au) {
+		if (jmap.i.Au) {
 			return jmap.addOverlay(poly);
 		}
 	},
-	/* addKml: function()
+	/* addRss: function()
 	 * Takes a KML file and renders it to the map.
 	 * Example: $().addPoint(...);
 	 */
-	addKml: function (kmlfile) {
+	addRss: function (rssfile) {
 		var jmap = this[0].jMap;
-		var geoXml = new GGeoXml(kmlfile);
-		return jmap.addOverlay(geoXml);
-	},
-	/* directions: function(query, panel)
-	 * Takes a Direction query and returns directions for map.  Optional panel for text information
-	 * Example: $().directions(...);
-	 */
-	directions: function(query,panel) {
-		var jmap = this[0].jMap;
-		var dirpanel = document.getElementById(panel);
-		directions = new GDirections(jmap, dirpanel);
-		directions.load(query);
+		// Yahoo Maps
+		if (jmap._mapType) {
+			var geoXml = new YGeoRSS(rssfile);
+			return jmap.addOverlay(geoXml);
+		}
+		// Google Maps
+		if (jmap.i.Au) {
+			var geoXml = new GGeoXml(rssfile);
+			return jmap.addOverlay(geoXml);
+		}
+		
 	}
 });
 })(jQuery);
