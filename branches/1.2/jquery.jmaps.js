@@ -45,10 +45,8 @@
 	function searchAddress(jmap, address, settings) {
 		
 		if (jmap._mapType) {
-			alert('Yahoo Maps Geocoding not yet supported');
-		}
-		
-		if (jmap.i.Au) {
+			alert('JMap does not yet support the Yahoo! Geocoder.');
+		} else if (jmap.i.Au) {
 			GGeocoder = new GClientGeocoder();
 			GGeocoder.getLatLng(address, function(point){
 				if (!point) {
@@ -65,6 +63,8 @@
 					});
 				}
 			});
+		} else {
+			alert('This is just to fix the google stuff');
 		}	
 	}
 	
@@ -160,6 +160,8 @@
 					break;
 					
 				case "mslive":
+					var jmap = this.jMap = new VEMap(this);
+					jmap.LoadMap();
 					alert('Microsoft Live Maps are currently not supported but planned for version 1.4')
 					break;
 					
