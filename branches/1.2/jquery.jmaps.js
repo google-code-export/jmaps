@@ -61,13 +61,15 @@ $.fn.extend({
 	jmap: function(settings) {
 		var version = "1.3";
 		/* Default Settings*/	
-		settings = jQuery.extend({
-			mapversion: "google",
-			maptype: G_HYBRID_TYPE,
+		var settings = jQuery.extend({
+			provider: "google",
+			maptype: "hybrid",
 			center: [55.958858,-3.162302],
 			zoom: 12,
 			control: "small",
 			showtype: true,
+			showzoom: true,
+			showpan: true,
 			showoverview: true,
 			dragging: true,
 			scrollzoom: true,
@@ -77,15 +79,33 @@ $.fn.extend({
 		},settings);
 		
 		return this.each(function(){
-			switch(settings.mapversion)
+			switch(settings.provider)
 			{
 				case "yahoo":
 					var jmap = this.jMap = new YMap(this);
-					jmap.setMapType(settings.maptype);
-					jmap.drawZoomAndCenter(new YCoordPoint(settings.center[0],settings.center[1]), settings.zoom);
+					switch(settings.maptype) {
+						case "map":
+							var loadmap = YAHOO_MAP_REG;
+							break;
+						case "sat":
+							var loadmap = YAHOO_MAP_SAT;
+							break;
+						default:
+							var loadmap = YAHOO_MAP_HYB;
+							break;
+					}
 					
+					jmap.setMapType(loadmap);
+					jmap.drawZoomAndCenter(new YGeoPoint(settings.center[0],settings.center[1]), settings.zoom);
+					console.log(jmap);
 					if (settings.showtype == true){
 						jmap.addTypeControl();
+					}
+					if (settings.showzoom == true){
+						jmap.addZoomLong();
+					}
+					if (settings.showpan == true) {
+						jmap.addPanControl();
 					}
 					break;
 					
@@ -95,7 +115,19 @@ $.fn.extend({
 					
 				default:	
 					var jmap = this.jMap = new GMap2(this);
-					jmap.setCenter(new GLatLng(settings.center[0],settings.center[1]),settings.zoom,settings.maptype);
+					switch(settings.maptype) {
+						case "map":
+							var loadmap = G_NORMAL_MAP;
+							break;
+						case "sat":
+							var loadmap = G_SATELLITE_MAP;
+							break;
+						default:
+							var loadmap = G_HYBRID_MAP;
+							break;
+					}
+					
+					jmap.setCenter(new GLatLng(settings.center[0],settings.center[1]),settings.zoom,loadmap);
 					
 					switch(settings.control)
 					{
@@ -129,7 +161,7 @@ $.fn.extend({
 						jmap.disableDragging();
 				}
 			}
-				
+			console.log(settings);	
 			/* Seach for the lat & lng of our address*/
 			jQuery(settings.searchbutton).bind('click', function(){
 				searchAddress(jmap, jQuery(settings.searchfield).attr('value'), settings);
@@ -150,31 +182,24 @@ $.fn.extend({
 	 * Example: $().addPoint(...);
 	 */
 	addPoint: function(pointlat, pointlng, pointhtml, isdraggable, removable, settings) {
-		switch(settings.mapversion)
-		{
-				case "yahoo":
-					var jmap = this[0].jMap;
-					var marker = new YGeoPoint(pointlat, pointlng);
-					jmap.addMarker(marker);
-					break;
-					
-				case "mslive":
-					alert('Microsoft Live Maps are currently not supported but planned for version 1.4')
-					break;
-					
-				default:
-					var jmap = this[0].jMap;
-					var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );
-					GEvent.addListener(marker, "click", function(){
-						marker.openInfoWindowHtml(pointhtml);
-					});
-					if (removable == true) {
-						GEvent.addListener(marker, "dblclick", function(){
-						return jmap.removeOverlay(marker);
-						});
-					}
-					return jmap.addOverlay(marker);
-					
+		console.log(this[0].jMap);
+		if (this[0].jMap._mapType == "YAHOO_HYB" || this[0].jMap._mapType == "YAHOO_SAT"  || this[0].jMap._mapType == "YAHOO_MAP") {
+			var jmap = this[0].jMap;
+			var marker = new YGeoPoint(pointlat, pointlng);
+			jmap.addMarker(marker);
+		}			
+		if (this[0].jMap.i.Au == "Hybrid" || this[0].jMap.i.Au == "Satellite" || this[0].jMap.i.Au == "Map") {
+			var jmap = this[0].jMap;
+			var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );
+			GEvent.addListener(marker, "click", function(){
+				marker.openInfoWindowHtml(pointhtml);
+			});
+			if (removable == true) {
+				GEvent.addListener(marker, "dblclick", function(){
+					return jmap.removeOverlay(marker);
+				});
+			}
+			return jmap.addOverlay(marker);
 		}
 	},
 	/* addPoly: function(poly)
