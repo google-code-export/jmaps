@@ -19,7 +19,16 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		<script type="text/javascript">
 			$('document').ready(function(){
 				$("#jmap").jmap({provider: "yahoo"});
-
+				
+				/*
+				var geoPointArray = [];
+				geoPointArray.push (new YGeoPoint(55.958858,-3.162302));
+				geoPointArray.push (new YGeoPoint(56.958858,-3.162302));
+				geoPointArray.push (new YGeoPoint(57.958858,-3.162302));
+				var polyline = new YPolyline(geoPointArray);
+				
+				$('#jmap').addPoly(polyline);
+				*/
 			$("a.showcode").bind("click", function(){
 				var showdiv = $(this).attr("href");
 				$(showdiv).toggle("fast");

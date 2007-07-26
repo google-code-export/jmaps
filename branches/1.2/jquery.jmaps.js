@@ -7,7 +7,9 @@
  * 
  * === Changelog ===
  * Version 1.3
- * 
+ * Added support for creating Yahoo! Maps, can create Map, Satallite or Hybrid.  Check out available options below
+ * Added support for creating points on Yahoo! maps.
+ * Added support for creating Polylines on Yahoo! maps.
  * 
  * Version 1.2 (25/07/2007)
  * Moved GClientGeocoder into searchAddress method
@@ -62,18 +64,19 @@ $.fn.extend({
 		var version = "1.3";
 		/* Default Settings*/	
 		var settings = jQuery.extend({
-			provider: "google",
-			maptype: "hybrid",
-			center: [55.958858,-3.162302],
-			zoom: 12,
-			control: "small",
-			showtype: true,
-			showzoom: true,
-			showpan: true,
-			showoverview: true,
-			dragging: true,
-			scrollzoom: true,
-			smoothzoom: true,
+			provider: "google",		// can be "google" or "yahoo"
+			maptype: "hybrid",		// can be "map", "sat" or "hybrid"
+			center: [55.958858,-3.162302],	// G + Y
+			zoom: 12,				// G + Y
+			controlsize: "small",	// G + Y
+			showtype: true,			// G + Y
+			showzoom: true,			// Y
+			showpan: true,			// Y
+			showoverview: true,		// G
+			showscale: true,		// Y
+			dragging: true,			// G + Y
+			scrollzoom: true,		// G + Y
+			smoothzoom: true,		// G
 			searchfield: "#Address",
 			searchbutton: "#findaddress"
 		},settings);
@@ -94,18 +97,32 @@ $.fn.extend({
 							var loadmap = YAHOO_MAP_HYB;
 							break;
 					}
-					
 					jmap.setMapType(loadmap);
 					jmap.drawZoomAndCenter(new YGeoPoint(settings.center[0],settings.center[1]), settings.zoom);
 					console.log(jmap);
 					if (settings.showtype == true){
-						jmap.addTypeControl();
+						jmap.addTypeControl();	// Type of map Control
 					}
-					if (settings.showzoom == true){
-						jmap.addZoomLong();
+					if (settings.showzoom == true && settings.controlsize == "small" ){
+						jmap.addZoomShort();	// Small zoom control
+					}
+					if (settings.showzoom == true && settings.controlsize == "large" ){
+						jmap.addZoomLong();		// Large zoom control
 					}
 					if (settings.showpan == true) {
-						jmap.addPanControl();
+						jmap.addPanControl();	// Pan control
+					}
+					if (settings.showscale == false) {
+						/* On by default */
+						jmap.removeZoomScale();	// Show scale bars
+					}
+					if (settings.dragging == false) {
+						/* On by default */
+						jmap.disableDragMap();	// Is map draggable?
+					}
+					if (settings.scrollzoom == false) {
+						/* On by default */
+						jmap.disableKeyControls(); // Mousewheel and Keyboard control
 					}
 					break;
 					
@@ -126,10 +143,8 @@ $.fn.extend({
 							var loadmap = G_HYBRID_MAP;
 							break;
 					}
-					
 					jmap.setCenter(new GLatLng(settings.center[0],settings.center[1]),settings.zoom,loadmap);
-					
-					switch(settings.control)
+					switch(settings.controlsize)
 					{
 						case "small":
 							jmap.addControl(new GSmallMapControl());
@@ -159,9 +174,8 @@ $.fn.extend({
 					if (settings.dragging == false) {
 						/* On by default */
 						jmap.disableDragging();
-				}
-			}
-			console.log(settings);	
+					}
+			}	
 			/* Seach for the lat & lng of our address*/
 			jQuery(settings.searchbutton).bind('click', function(){
 				searchAddress(jmap, jQuery(settings.searchfield).attr('value'), settings);
@@ -181,14 +195,25 @@ $.fn.extend({
 	 * Returns a marker to be overlayed on the Google map
 	 * Example: $().addPoint(...);
 	 */
-	addPoint: function(pointlat, pointlng, pointhtml, isdraggable, removable, settings) {
-		console.log(this[0].jMap);
-		if (this[0].jMap._mapType == "YAHOO_HYB" || this[0].jMap._mapType == "YAHOO_SAT"  || this[0].jMap._mapType == "YAHOO_MAP") {
+	addPoint: function(pointlat, pointlng, pointhtml, isdraggable, removable) {
+		// Yahoo Maps
+		if (this[0].jMap._mapType) {
 			var jmap = this[0].jMap;
-			var marker = new YGeoPoint(pointlat, pointlng);
-			jmap.addMarker(marker);
-		}			
-		if (this[0].jMap.i.Au == "Hybrid" || this[0].jMap.i.Au == "Satellite" || this[0].jMap.i.Au == "Map") {
+			var marker = new YMarker(new YGeoPoint(pointlat, pointlng));	// Create the Yahoo marker type
+			YEvent.Capture(marker, EventsList.MouseClick, function(){		// Add mouseclick to open HTML
+				marker.openSmartWindow(pointhtml);
+			});
+			// Below code does not work as expected
+			/*if (removable == true) {
+				YEvent.Capture(marker, EventsList.MouseDoubleClick, function(){
+					jmap.removeOverlay(marker);
+				});
+			}*/
+			jmap.addOverlay(marker);	// Add marker to map
+		}
+		
+		// Google Maps	
+		if (this[0].jMap.i.Au) {
 			var jmap = this[0].jMap;
 			var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );
 			GEvent.addListener(marker, "click", function(){
@@ -206,9 +231,16 @@ $.fn.extend({
 	 * Takes an array of GLatLng points, converts it to a vector Polyline to display on the map
 	 * Example: $().addPoly(...);
 	 */
-	addPoly: function (poly) {
+	addPoly: function (poly, colour, width, alpha) {
 		var jmap = this[0].jMap;
-		return jmap.addOverlay(poly);
+		// Yahoo Maps
+		if (this[0].jMap._mapType) {
+			return	jmap.addOverlay(poly, colour, width, alpha);
+		}
+		// Google Maps
+		if (this[0].jMap.i.Au) {
+			return jmap.addOverlay(poly);
+		}
 	},
 	/* addKml: function()
 	 * Takes a KML file and renders it to the map.
