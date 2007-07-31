@@ -1,25 +1,31 @@
 /* jQuery Maps (jmaps) - A jQuery plugin for Google Maps API
- * Author: Tane Piper (digitalspaghetti@gmail.com) 
+ * Author: Tane Piper (digitalspaghetti at gmail dot com) 
  * With special thanks Dave Cardwell (who helped on getting the first version of this plugin to work).
- * Website: http://code.google.com/p/gmapp/
+ * Website: http://code.google.com/p/jmaps/
  * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
  * This plugin is not affiliated with Google or Yahoo.  
  * For Google Maps API and T&C see http://www.google.com/apis/maps/
  * For Yahoo! Maps API and T&C see http://developer.yahoo.com/maps/
  * 
- * === Changelog ===
- * Version 1.3 (in development)
+ * For support, I can usually be found on the #jquery IRC channel on irc.freenode.net
+ * ===============================================================================================================
+ * ^^^ Changelog ^^^
+ * Version 1.3 (31/07/2007)
  * Added support for creating Yahoo! Maps, can create Map, Satallite or Hybrid.  Check out available options below
  * Added support for creating points on Yahoo! maps.
  * Added support for creating Polylines on Yahoo! maps.
  * Added support for GeoRSS files on both Yahoo! and Google maps, as well as existing KML support for Google, method
  * name was changed from .addKml to .addRss
  * Moved directions search out of main namespace, now function that is called from within plugin by providing fields
+ * Added Yahoo! Geocoding support
  * 
+ * Known 1.3 Bugs
+ * Event.MouseDoubleClick does not work on Yahoo maps within .addPoint method
+ * ===============================================================================================================
  * Version 1.2 (25/07/2007)
  * Moved GClientGeocoder into searchAddress method
  * Fixed bug in searchAddress method regarding getPoint().
- * 
+ * ===============================================================================================================
  * Version 1.1 (16/07/2007)
  * Changed name to remove Google from main name - namespace now .jmap.
  * Added additional options:
@@ -30,12 +36,13 @@
  * Added .addPoly method.  Allows the creation of polylines on the map.
  * Added .addKml support for rendering KML Files.
  * Added .directions Driving Direction support.
- * 
+ * ===============================================================================================================
  * Version 1.0 (13/07/2007)
  * Initial version.
  * Creates Google Map.
  * Add points to map.
  * Takes address or postcode, Geocodes and centers map.  Also creates a draggable marker.
+ * ===============================================================================================================
  */
 (function($) {
 	/* function searchAddress(jmap, address, settings)
@@ -46,20 +53,19 @@
 		// Yahoo Maps
 		if (jmap._mapType) {
 			jmap.geoCodeAddress(address);
-			YEvent.Capture(jmap, EventsList.onEndGeoCode, function(point){
-				if(!point) {
+			YEvent.Capture(jmap, EventsList.onEndGeoCode, function(e){
+				if(e.success == 0) {
 					alert(address + " not found");
 				} else {
-					console.log(point);
-					jmap.drawZoomAndCenter(new YGeoPoint(point.GeoPoint.Lat,point.GeoPoint.Lon), settings.zoom);
-					var marker = new YMarker(new YGeoPoint(point.GeoPoint.Lat,point.GeoPoint.Lon));	// Create the Yahoo marker type
-					//YEvent.Capture(marker, EventsList.MouseClick, function(){		// Add mouseclick to open HTML
-						marker.openSmartWindow("Latitude: " + point.GeoPoint.Lat + "<br />Longitude: " + point.GeoPoint.Lon);
-					//});
+					point = new YGeoPoint(e.GeoPoint.Lat,e.GeoPoint.Lon);
+					jmap.drawZoomAndCenter(point, settings.zoom);
+					var marker = new YMarker(point);	// Create the Yahoo marker type
+					marker.openSmartWindow("Latitude: " + point.Lat + "<br />Longitude: " + point.Lon);
 					jmap.addOverlay(marker);	// Add marker to map
 				}
 			});
-		} else if (jmap.i.Au) { //Google Maps
+			//Google Maps
+		} else if (jmap.i.Au) {
 			GGeocoder = new GClientGeocoder();
 			GGeocoder.getLatLng(address, function(point){
 				if (!point) {
@@ -77,7 +83,7 @@
 				}
 			});
 		} else {
-			alert('This is just to fix the google stuff');
+			alert('Map Object Not Found!');
 		}	
 	}
 	
@@ -87,7 +93,7 @@
 	function searchDirections(jmap,query,panel) {
 		// Yahoo Maps
 		if (jmap._mapType) {
-			alert('Yahoo Directions support not yet added')	;
+			alert('Yahoo Maps Do Not Support Directions');
 		} else if (jmap.i.Au) { //Google Maps
 			var dirpanel = document.getElementById(panel);
 			directions = new GDirections(jmap, dirpanel);
@@ -115,7 +121,7 @@
 			showoverview: true,		// G
 			showscale: true,		// Y
 			dragging: true,			// G + Y
-			scrollzoom: true,		// G + Y
+			scrollzoom: false,		// G + Y
 			smoothzoom: true,		// G
 			searchfield: "#Address",
 			searchbutton: "#findaddress",
@@ -170,8 +176,6 @@
 					break;
 					
 				case "mslive":
-					var jmap = this.jMap = new VEMap(this);
-					jmap.LoadMap();
 					alert('Microsoft Live Maps are currently not supported but planned for version 1.4')
 					break;
 					
@@ -203,10 +207,10 @@
 							jmap.addControl(new GSmallMapControl());
 					}
 					if (settings.showtype == true){
-						jmap.addControl(new GMapTypeControl());
+						jmap.addControl(new GMapTypeControl());// Type of map Control
 					}
 					if (settings.showoverview == true){
-						jmap.addControl(new GOverviewMapControl());
+						jmap.addControl(new GOverviewMapControl());//Overview Map
 					}
 					if (settings.scrollzoom == true) {
 						/* Off by default */
@@ -258,12 +262,12 @@
 			YEvent.Capture(marker, EventsList.MouseClick, function(){		// Add mouseclick to open HTML
 				marker.openSmartWindow(pointhtml);
 			});
-			// Below code does not work as expected
-			/*if (removable == true) {
-				YEvent.Capture(marker, EventsList.MouseDoubleClick, function(){
+			// Below code does not work at this time
+			if (removable == true) {
+				YEvent.Capture(marker, EventsList.MouseDoubleClick, function(e){
 					jmap.removeOverlay(marker);
 				});
-			}*/
+			}
 			jmap.addOverlay(marker);	// Add marker to map
 		} else if (jmap.i.Au) { // Google Maps
 			var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );

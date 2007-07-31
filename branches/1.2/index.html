@@ -63,6 +63,7 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 
 	<ul>
 		<li><a href="#changelog">Changelog</a></li>
+		<li><a href="#known-todo">Known Bugs & To Do</a></li>
 		<li><a href="#useage">Useage</a></li>
 		<li><a href="#example">Example</a></li>
 		<li><a href="#demo">Demo</a></li>
@@ -72,6 +73,23 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 	<a name="changelog"><h2>Changelog</h2></a>
 	
 	<ul>
+		<li>Version 1.3
+			<ul>
+				<li>Added support for creating Yahoo! Maps, can create Map, Satallite or Hybrid.</li>
+				<li>Added support for creating points on Yahoo! maps.</li>
+				<li>Added support for creating Polylines on Yahoo! maps.</li>
+				<li>Added support for GeoRSS files on both Yahoo! and Google maps, as well as existing KML support for Google, method name was changed from .addKml to .addRss</li>
+				<li>Moved directions search out of main namespace, now function that is called from within plugin by providing fields</li>
+				<li>Added Yahoo! Geocoding support</li>
+			</ul>
+		</li>
+		<li>Version 1.2
+			<ul>
+				<li>Moved GClientGeocoder into searchAddress method</li>
+				<li>Fixed bug in searchAddress method regarding getPoint().</li>
+			</ul>
+		
+		</li>
 		<li>Version 1.1
 			<ul>
 				<li>Changed name to remove Google from main name - namespace now .jmap.</li>
@@ -97,6 +115,23 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		</ul>
 		</li>
 	</ul>
+	</p>
+	
+	<a name="known-todo"><h2>Known Bugs &amp; To Do</h2></a>
+	<p>
+		<strong>Known Bugs</strong>
+		<ul>
+			<li>Removing point does not work on Yahoo! Maps (YEvent for MouseDoubleClick fails)</li>
+		</ul>
+	</p>
+	<p>
+		<strong>To Do</strong>
+		<ul>
+			<li>Add in custom icon support for points.</li>
+			<li>Add support for Google Points Manager</li>
+			<li>Add support for overlays</li>
+		</ul>
+		Don't see anything here you would like, add it to the <a href="http://code.google.com/p/jmaps/issues/list">Wishlist</a>
 	</p>
 	
 	<a name="useage"><h2>Useage</h2></a>
