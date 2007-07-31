@@ -45,7 +45,20 @@
 	function searchAddress(jmap, address, settings) {
 		// Yahoo Maps
 		if (jmap._mapType) {
-			alert('JMap does not yet support the Yahoo! Geocoder.');
+			jmap.geoCodeAddress(address);
+			YEvent.Capture(jmap, EventsList.onEndGeoCode, function(point){
+				if(!point) {
+					alert(address + " not found");
+				} else {
+					console.log(point);
+					jmap.drawZoomAndCenter(new YGeoPoint(point.GeoPoint.Lat,point.GeoPoint.Lon), settings.zoom);
+					var marker = new YMarker(new YGeoPoint(point.GeoPoint.Lat,point.GeoPoint.Lon));	// Create the Yahoo marker type
+					//YEvent.Capture(marker, EventsList.MouseClick, function(){		// Add mouseclick to open HTML
+						marker.openSmartWindow("Latitude: " + point.GeoPoint.Lat + "<br />Longitude: " + point.GeoPoint.Lon);
+					//});
+					jmap.addOverlay(marker);	// Add marker to map
+				}
+			});
 		} else if (jmap.i.Au) { //Google Maps
 			GGeocoder = new GClientGeocoder();
 			GGeocoder.getLatLng(address, function(point){
