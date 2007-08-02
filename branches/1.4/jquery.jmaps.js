@@ -224,6 +224,13 @@
 						/* On by default */
 						jmap.disableDragging();
 					}
+					
+					GEvent.addListener(jmap, "dblclick", function(){  //FIXME: Currently only creates 1 marker
+						var marker = new GMarker(new GLatLng(this.Ou.Mj,this.Ou.Da));
+						return this.addOverlay(marker);
+						console.log(this);
+						alert('Add map marker here');
+					});
 			}	
 			/* Seach for the lat & lng of our address*/
 			jQuery(settings.searchbutton).bind('click', function(){
