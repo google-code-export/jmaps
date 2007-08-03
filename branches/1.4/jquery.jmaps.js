@@ -9,12 +9,12 @@
  * 
  * For support, I can usually be found on the #jquery IRC channel on irc.freenode.net
  * ===============================================================================================================
+ * ^^^ Changelog ^^^
  * Version 1.4 (In development)
  * Added option to double click on map to add marker.  Single click on marker gives Lat/Lng details, while double click removes
  * Added callback function to options
- * Moved searchAddress and searchDirections back into main function, can now be called via .searchAddress and .searchDirections
+ * Moved searchAddress and searchDirections back into main function, can now be called via .searchAddress and .searchDirections, removed options for fields to pass in data
  * ===============================================================================================================
- * ^^^ Changelog ^^^
  * Version 1.3 (31/07/2007)
  * Added support for creating Yahoo! Maps, can create Map, Satallite or Hybrid.  Check out available options below
  * Added support for creating points on Yahoo! maps.
@@ -72,12 +72,6 @@
 			scrollzoom: false,		// G + Y
 			smoothzoom: true,		// G
 			clickmarker: true,		// G
-			searchfield: "#Address",
-			searchbutton: "#findaddress",
-			directionsto: "#to",
-			directionsfrom: "#from",
-			directionsfind: "#getDirections",
-			directionspanel: "myDirections",
 			callback: function(){}
 		},settings);
 		
@@ -137,8 +131,10 @@
 					
 					break;
 					
-				case "mslive":
-					alert('Microsoft Live Maps are currently not supported but planned for version 1.4')
+				case "vearth":
+					var jmap = this.jMap = new VEMap(this);
+					console.log(jmap)
+					jmap.LoadMap();
 					break;
 					
 				default:	
