@@ -9,13 +9,16 @@
  * 
  * For support, I can usually be found on the #jquery IRC channel on irc.freenode.net
  * ===============================================================================================================
+ * Version 1.4 (In development)
+ * Added option to double click on map to add marker.  Single click on marker gives Lat/Lng details, while double click removes
+ * 
+ * ===============================================================================================================
  * ^^^ Changelog ^^^
  * Version 1.3 (31/07/2007)
  * Added support for creating Yahoo! Maps, can create Map, Satallite or Hybrid.  Check out available options below
  * Added support for creating points on Yahoo! maps.
  * Added support for creating Polylines on Yahoo! maps.
- * Added support for GeoRSS files on both Yahoo! and Google maps, as well as existing KML support for Google, method
- * name was changed from .addKml to .addRss
+ * Added support for GeoRSS files on both Yahoo! and Google maps, as well as existing KML support for Google, method name was changed from .addKml to .addRss
  * Moved directions search out of main namespace, now function that is called from within plugin by providing fields
  * Added Yahoo! Geocoding support
  * 
@@ -123,6 +126,7 @@
 			dragging: true,			// G + Y
 			scrollzoom: false,		// G + Y
 			smoothzoom: true,		// G
+			clickmarker: true,		// G
 			searchfield: "#Address",
 			searchbutton: "#findaddress",
 			directionsto: "#to",
@@ -173,6 +177,18 @@
 						/* On by default */
 						jmap.disableKeyControls(); // Mousewheel and Keyboard control
 					}
+					//FIXME: Click marker function not working in Yahoo
+					if (settings.clickmarker == true){
+						YEvent.Capture(jmap, EventsList.MouseClick, function(marker, point){
+							if (marker) {
+								
+							} else {
+								var marker = new YGeoPoint(point.Lat, point.Lon);
+								jmap.addMarker(marker);
+							}
+						});
+					}
+					
 					break;
 					
 				case "mslive":
@@ -225,12 +241,20 @@
 						jmap.disableDragging();
 					}
 					
-					GEvent.addListener(jmap, "dblclick", function(){  //FIXME: Currently only creates 1 marker
-						var marker = new GMarker(new GLatLng(this.Ou.Mj,this.Ou.Da));
-						return this.addOverlay(marker);
-						console.log(this);
-						alert('Add map marker here');
-					});
+					if (settings.clickmarker == true){
+						GEvent.addListener(jmap, "dblclick", function(marker, point){
+							if (marker) {
+								jmap.removeOverlay(marker);
+							} else {
+								var marker = new GMarker(point);
+								jmap.addOverlay(marker);
+								GEvent.addListener(marker, 'click', function(){
+									pointlocation = marker.getPoint();
+									marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());
+								})	
+							}
+						});
+					}
 			}	
 			/* Seach for the lat & lng of our address*/
 			jQuery(settings.searchbutton).bind('click', function(){
@@ -271,7 +295,7 @@
 			});
 			// Below code does not work at this time
 			if (removable == true) {
-				YEvent.Capture(marker, EventsList.MouseDoubleClick, function(e){
+				YEvent.Capture(marker, EventsList.MouseDoubleClick, function(marker){
 					jmap.removeOverlay(marker);
 				});
 			}
