@@ -12,8 +12,9 @@
  * ^^^ Changelog ^^^
  * Version 1.4 (In development)
  * Added option to double click on map to add marker.  Single click on marker gives Lat/Lng details, while double click removes
- * Added callback function to options
  * Moved searchAddress and searchDirections back into main function, can now be called via .searchAddress and .searchDirections, removed options for fields to pass in data
+ * Added support for new Google Ad's Manager for Maps.  Can be enabled with .mapAds()
+ * Added support in searchAddress to return as a map, or as an array of Lat/Lng
  * ===============================================================================================================
  * Version 1.3 (31/07/2007)
  * Added support for creating Yahoo! Maps, can create Map, Satallite or Hybrid.  Check out available options below
@@ -71,8 +72,7 @@
 			dragging: true,			// G + Y
 			scrollzoom: false,		// G + Y
 			smoothzoom: true,		// G
-			clickmarker: true,		// G
-			callback: function(){}
+			clickmarker: true		// G
 		},settings);
 		
 		return this.each(function(){
@@ -229,7 +229,7 @@
 				});
 			}
 			jmap.addOverlay(marker);	// Add marker to map
-		} else if (jmap.i.Au) { // Google Maps
+		} else if (GBrowserIsCompatible()) { // Google Maps
 			var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );
 			GEvent.addListener(marker, "click", function(){
 				marker.openInfoWindowHtml(pointhtml);
@@ -251,7 +251,7 @@
 		// Yahoo Maps
 		if (jmap._mapType) {
 			return	jmap.addOverlay(poly, colour, width, alpha);
-		} else if (jmap.i.Au) { // Google Maps	
+		} else if (GBrowserIsCompatible()) { // Google Maps	
 			return jmap.addOverlay(poly);
 		}
 	},
@@ -265,13 +265,18 @@
 		if (jmap._mapType) {
 			var geoXml = new YGeoRSS(rssfile);
 			return jmap.addOverlay(geoXml);
-		} else if (jmap.i.Au) {  // Google Maps	
+		} else if (GBrowserIsCompatible()) {  // Google Maps	
 			var geoXml = new GGeoXml(rssfile);
 			return jmap.addOverlay(geoXml);
 		}
 		
 	},
-	searchAddress: function (address) {
+	searchAddress: function (address, settings, callback) {
+
+		var settings = jQuery.extend({
+			returntype: "map"	//Return as Map or a Object
+		},settings);
+
 		var jmap = this[0].jMap;
 		// Yahoo Maps
 		if (jmap._mapType) {
@@ -280,29 +285,49 @@
 				if(e.success == 0) {
 					alert(address + " not found");
 				} else {
-					point = new YGeoPoint(e.GeoPoint.Lat,e.GeoPoint.Lon);
-					jmap.drawZoomAndCenter(point);
-					var marker = new YMarker(point);	// Create the Yahoo marker type
-					marker.openSmartWindow("Latitude: " + point.Lat + "<br />Longitude: " + point.Lon);
-					jmap.addOverlay(marker);	// Add marker to map
+					switch (settings.returntype) {
+						case "object":
+							var results = [];
+							results[0] = e.GeoPoint.Lat;
+							results[1] = e.GeoPoint.Lon;
+							callback(results);
+							break;
+						default:
+							point = new YGeoPoint(e.GeoPoint.Lat,e.GeoPoint.Lon);
+							jmap.drawZoomAndCenter(point);
+							var marker = new YMarker(point);	// Create the Yahoo marker type
+							marker.openSmartWindow("Latitude: " + point.Lat + "<br />Longitude: " + point.Lon);
+							jmap.addOverlay(marker);	// Add marker to map
+							break;
+					}
 				}
 			});
 			//Google Maps
-		} else if (jmap.i.Au) {
+		} else if (GBrowserIsCompatible()) {
 			GGeocoder = new GClientGeocoder();
 			GGeocoder.getLatLng(address, function(point){
 				if (!point) {
 					alert(address + " not found");
 				} else {
-					jmap.setCenter(point);
-					var marker = new GMarker(point, {draggable: true});
-					jmap.addOverlay(marker);
-					pointlocation = marker.getPoint();
-					marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());
-					GEvent.addListener(marker, "dragend", function(){
-						mylocation = marker.getPoint();
-						marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());			
-					});
+					switch (settings.returntype) {
+						case "object":
+							var results = [];
+							results[0] = point.y;
+							results[1] = point.x;						
+							callback(results);
+							break;
+						default:
+							jmap.setCenter(point);
+							var marker = new GMarker(point, {draggable: true});
+							jmap.addOverlay(marker);
+							pointlocation = marker.getPoint();
+							marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());
+							GEvent.addListener(marker, "dragend", function(){
+								mylocation = marker.getPoint();
+								marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());			
+							});
+							break;
+					}
 				}
 			});
 		} else {
@@ -314,11 +339,22 @@
 		// Yahoo Maps
 		if (jmap._mapType) {
 			alert('Yahoo Maps Do Not Support Directions');
-		} else if (jmap.i.Au) { //Google Maps
+		} else if (GBrowserIsCompatible()) { //Google Maps
 			var dirpanel = document.getElementById(panel);
 			search = new GDirections(jmap, dirpanel);
 			search.load('from:' + from + ' to:' + to);
 		}
+	},
+	mapAds : function (p,o) {
+		var jmap = this[0].jMap;
+		var o = jQuery.extend({
+			maxAdsOnMap: 3,
+			channel: "",
+			minZoomLevel: 6
+		},o);		
+		var adsManager = new GAdsManager(jmap, p, o);
+		console.log(adsManager);
+		adsManager.enable();
 	}
 });
 })(jQuery);

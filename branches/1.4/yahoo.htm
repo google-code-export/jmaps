@@ -22,15 +22,13 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 			$('document').ready(function(){
 				$("#jmap").jmap({provider: "yahoo"});
 				
-				/*
-				var geoPointArray = [];
-				geoPointArray.push (new YGeoPoint(55.958858,-3.162302));
-				geoPointArray.push (new YGeoPoint(56.958858,-3.162302));
-				geoPointArray.push (new YGeoPoint(57.958858,-3.162302));
-				var polyline = new YPolyline(geoPointArray);
+				$('#findaddress').bind('click', function(){
+					$('#jmap').searchAddress($('#Address').val(), {returntype: "object"}, function(e){
+						$('#mydirections').html('Point Found:<br />Lat: ' + e[0] + ',<br /> Lng: ' + e[1] + '<br /><a href="#" class="addPoint" onclick="javascript:$(\'#gmap\').addPoint(\'' + e[0] + '\', \'' + e[1] + '\');$(\'#gmap\').myMap().setCenter(new GLatLng(' + e[0] + ', ' + e[1] + '));return false;\">Add Point</a>');
+					});
+					
+				});
 				
-				$('#jmap').addPoly(polyline);
-				*/
 			$("a.showcode").bind("click", function(){
 				var showdiv = $(this).attr("href");
 				$(showdiv).toggle("fast");
