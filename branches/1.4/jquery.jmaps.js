@@ -182,7 +182,7 @@
 						/* On by default */
 						jmap.disableDragging();
 					}
-					
+					console.log(jmap);
 					if (settings.clickmarker == true){
 						GEvent.addListener(jmap, "dblclick", function(marker, point){
 							if (marker) {
@@ -229,7 +229,7 @@
 				});
 			}
 			jmap.addOverlay(marker);	// Add marker to map
-		} else if (GBrowserIsCompatible()) { // Google Maps
+		} else if (jmap.b.jMap) { // Google Maps
 			var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );
 			GEvent.addListener(marker, "click", function(){
 				marker.openInfoWindowHtml(pointhtml);
@@ -251,7 +251,7 @@
 		// Yahoo Maps
 		if (jmap._mapType) {
 			return	jmap.addOverlay(poly, colour, width, alpha);
-		} else if (GBrowserIsCompatible()) { // Google Maps	
+		} else if (jmap.b.jMap) { // Google Maps	
 			return jmap.addOverlay(poly);
 		}
 	},
@@ -265,7 +265,7 @@
 		if (jmap._mapType) {
 			var geoXml = new YGeoRSS(rssfile);
 			return jmap.addOverlay(geoXml);
-		} else if (GBrowserIsCompatible()) {  // Google Maps	
+		} else if (jmap.b.jMap) {  // Google Maps	
 			var geoXml = new GGeoXml(rssfile);
 			return jmap.addOverlay(geoXml);
 		}
@@ -303,7 +303,7 @@
 				}
 			});
 			//Google Maps
-		} else if (GBrowserIsCompatible()) {
+		} else if (jmap.b.jMap) {
 			GGeocoder = new GClientGeocoder();
 			GGeocoder.getLatLng(address, function(point){
 				if (!point) {
@@ -339,7 +339,7 @@
 		// Yahoo Maps
 		if (jmap._mapType) {
 			alert('Yahoo Maps Do Not Support Directions');
-		} else if (GBrowserIsCompatible()) { //Google Maps
+		} else if (jmap.b.jMap) { //Google Maps
 			var dirpanel = document.getElementById(panel);
 			search = new GDirections(jmap, dirpanel);
 			search.load('from:' + from + ' to:' + to);
