@@ -16,6 +16,9 @@
  * Added support for new Google Ad's Manager for Maps.  Can be enabled with .mapAds()
  * Added support in searchAddress to return as a map, or as an array of Lat/Lng
  * ===============================================================================================================
+ * Version 1.3.1 (06/08/2007)
+ * Fixed bug with change in Google Maps API
+ * ===============================================================================================================
  * Version 1.3 (31/07/2007)
  * Added support for creating Yahoo! Maps, can create Map, Satallite or Hybrid.  Check out available options below
  * Added support for creating points on Yahoo! maps.
@@ -56,7 +59,7 @@
 	 * Example: $().jmap();
 	 */
 	jmap: function(settings) {
-		var version = "1.3";
+		var version = "1.3.1";
 		/* Default Settings*/	
 		var settings = jQuery.extend({
 			provider: "google",		// can be "google" or "yahoo"
@@ -320,10 +323,9 @@
 							jmap.setCenter(point);
 							var marker = new GMarker(point, {draggable: true});
 							jmap.addOverlay(marker);
-							pointlocation = marker.getPoint();
+							var pointlocation = marker.getPoint();
 							marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());
-							GEvent.addListener(marker, "dragend", function(){
-								mylocation = marker.getPoint();
+							GEvent.addListener(marker, "dragend", function(pointlocation){
 								marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());			
 							});
 							break;

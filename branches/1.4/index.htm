@@ -21,11 +21,11 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 			$('document').ready(function(){
 				$("#gmap").jmap();
 				$("#gmap2").jmap({maptype: "map", center: [28.038046,-81.062622], zoom: 9});
-				$("#gmap2").mapAds('ca-pub-3237221231926969');
+				$("#gmap2").mapAds('pub-3237221231926969');
 				
 				$('#findaddress').bind('click', function(){
 					$('#gmap').searchAddress($('#Address').val(), {returntype: "object"}, function(e){
-						$('#mydirections').html('Point Found:<br />Lat: ' + e[0] + ',<br /> Lng: ' + e[1] + '<br /><a href="#" class="addPoint" onclick="javascript:$(\'#gmap\').addPoint(\'' + e[0] + '\', \'' + e[1] + '\');$(\'#gmap\').myMap().setCenter(new GLatLng(' + e[0] + ', ' + e[1] + '));return false;\">Add Point</a>');
+						$('#mydirections').html('Point Found:<br />Lat: ' + e[0] + ',<br /> Lng: ' + e[1] + '<br /><a href="#" class="addPoint" onclick="javascript:$(\'#gmap\').addPoint(\'' + e[0] + '\', \'' + e[1] + '\', \'' + $('#Address').val() + '\', true, true);$(\'#gmap\').myMap().setCenter(new GLatLng(' + e[0] + ', ' + e[1] + '));return false;\">Add Point</a>');
 					});
 					
 				});
@@ -360,10 +360,10 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		A hotel is an establishment that provides paid lodging, usually on a short-term basis. Hotels often provide a number of additional guest services such as a restaurant, a swimming pool or childcare. Some hotels have conference services and meeting rooms and encourage groups to hold conventions and meetings at their location. In Australia, the word may also refer to a pub or bar. In the UK similarly, many pubs with "hotel" in their name do not offer accommodation or even food. In India, the word may also refer to a restaurant since the best restaurants were always situated next to a good hotel. The word hotel derives from the French hô, which referred to a French version of a townhouse or any other building seeing frequent visitors, not a place offering accommodation (in contemporary usage, hô has the meaning of "hotel", and hô particulier is used for the old meaning). The French spelling (with the circumflex) was once also used in English, but is now rare. The circumflex replaces the 's' once preceding the 't' in the earlier hostel spelling, which over time received a new, but closely related meaning.
 	</p>
 	<a name="download"><h2>Download</h2></a>
-		<strong>jQuery Google Map Application Version 1.3</strong>
+		<strong>jQuery Google Map Application Version 1.3.1</strong>
 		<ul>
-		<li><a href="http://jmaps.googlecode.com/files/jquery.jmaps.1-3.js">Unpacked Version</a></li>
-		<li><a href="http://jmaps.googlecode.com/files/jquery.jmaps.packed.1-3.js">Packed Version</a></li>
+		<li><a href="http://jmaps.googlecode.com/files/jquery.jmaps.1-3-1.js">Unpacked Version</a></li>
+		<li><a href="http://jmaps.googlecode.com/files/jquery.jmaps.packed.1-3-1.js">Packed Version</a></li>
 		</ul>
 	</body>
 </html>
