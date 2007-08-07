@@ -20,19 +20,22 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		<script type="text/javascript">
 			$('document').ready(function(){
 				$("#gmap").jmap();
-				$("#gmap2").jmap({maptype: "map", center: [28.038046,-81.062622], zoom: 9});
+				$("#gmap2").jmap({maptype: "map", center: [39.7977,-105.017], zoom: 9});
 				$("#gmap2").mapAds('pub-3237221231926969');
-				
 				$('#findaddress').bind('click', function(){
 					$('#gmap').searchAddress($('#Address').val(), {returntype: "object"}, function(e){
 						$('#mydirections').html('Point Found:<br />Lat: ' + e[0] + ',<br /> Lng: ' + e[1] + '<br /><a href="#" class="addPoint" onclick="javascript:$(\'#gmap\').addPoint(\'' + e[0] + '\', \'' + e[1] + '\', \'' + $('#Address').val() + '\', true, true);$(\'#gmap\').myMap().setCenter(new GLatLng(' + e[0] + ', ' + e[1] + '));return false;\">Add Point</a>');
+						$('#foundsofar ul').append('<li>' + e + '</li>');
+						
 					});
 					
 				});
 				$('#getDirections').bind('click', function(){
 					$('#gmap').searchDirections($('#from').val(), $('#to').val(), 'mydirections');
 				});
-				
+				$("#gmap2").addRss('http://maps.google.com/maps/ms?ie=UTF8&hl=en&mpnum=3&msa=0&output=nl&msid=105908361722510016031.00000112b557479bc5bc6', function(){
+					console.log('RSS added');
+				});
 
 			$("a.showcode").bind("click", function(){
 				var showdiv = $(this).attr("href");
@@ -346,6 +349,10 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		To: <input type="text" id="to" /><br />
 		<input type="submit" value="Get Directions" id="getDirections" />
 		<div id="mydirections" style="max-height:250px; overflow:auto;"></div>
+		<div id="foundsofar" style="max-height:250px; overflow:auto;">
+			<strong>Found So Far:</strong>
+			<ul></ul>
+		</div>
 	</div>
 	<br style="clear:both;" />
 	<h2><span style="color:red">New</span>: Google Map Adds</h2>

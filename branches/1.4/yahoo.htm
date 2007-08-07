@@ -24,9 +24,13 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 				
 				$('#findaddress').bind('click', function(){
 					$('#jmap').searchAddress($('#Address').val(), {returntype: "object"}, function(e){
-						$('#mydirections').html('Point Found:<br />Lat: ' + e[0] + ',<br /> Lng: ' + e[1] + '<br /><a href="#" class="addPoint" onclick="javascript:$(\'#gmap\').addPoint(\'' + e[0] + '\', \'' + e[1] + '\');$(\'#gmap\').myMap().setCenter(new GLatLng(' + e[0] + ', ' + e[1] + '));return false;\">Add Point</a>');
+						$('#mydirections').html('Point Found:<br />Lat: ' + e[0] + ',<br /> Lng: ' + e[1] + '<br /><a href="#" class="addPoint" onclick="javascript:$(\'#jmap\').addPoint(\'' + e[0] + '\', \'' + e[1] + '\', \'' + $('#Address').val() + '\', true, true);$(\'#jmap\').myMap().drawZoomAndCenter(new YGeoPoint(' + e[0] + ', ' + e[1] + '));return false;\">Add Point</a>');
 					});
 					
+				});
+				
+				$('#jmap').addRss('http://developer.yahoo.com/maps/sample.xml', function(){
+					console.log('Rss Added');
 				});
 				
 			$("a.showcode").bind("click", function(){
@@ -78,7 +82,7 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		From: <input type="text" id="from" /><br />
 		To: <input type="text" id="to" /><br />
 		<input type="submit" value="Get Directions" id="getDirections" />
-		<div id="myDirections" style="max-height:250px; overflow:auto;"></div>
+		<div id="mydirections" style="max-height:250px; overflow:auto;"></div>
 	</div>
 	<br style="clear:both;" />
 	</body>

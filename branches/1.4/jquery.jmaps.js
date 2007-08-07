@@ -14,7 +14,8 @@
  * Added option to double click on map to add marker.  Single click on marker gives Lat/Lng details, while double click removes
  * Moved searchAddress and searchDirections back into main function, can now be called via .searchAddress and .searchDirections, removed options for fields to pass in data
  * Added support for new Google Ad's Manager for Maps.  Can be enabled with .mapAds()
- * Added support in searchAddress to return as a map, or as an array of Lat/Lng
+ * Added callback in searchAddress to return as a map, or as an array of Lat/Lng
+ * Added callback in addRss
  * ===============================================================================================================
  * Version 1.3.1 (06/08/2007)
  * Fixed bug with change in Google Maps API
@@ -133,13 +134,6 @@
 					}
 					
 					break;
-					
-				case "vearth":
-					var jmap = this.jMap = new VEMap(this);
-					console.log(jmap)
-					jmap.LoadMap();
-					break;
-					
 				default:	
 					var jmap = this.jMap = new GMap2(this);
 					switch(settings.maptype) {
@@ -185,7 +179,6 @@
 						/* On by default */
 						jmap.disableDragging();
 					}
-					console.log(jmap);
 					if (settings.clickmarker == true){
 						GEvent.addListener(jmap, "dblclick", function(marker, point){
 							if (marker) {
@@ -202,7 +195,9 @@
 					}
 			}	
 			/* On document unload, clean unload Google API*/
-			jQuery(document).unload(function(){ GUnload(); });
+			if (jmap.b.jMap) {
+				jQuery(document).unload(function(){ GUnload(); });
+			}
 		});
 		},
 	/* myMap: function()
@@ -262,14 +257,15 @@
 	 * Takes a KML file and renders it to the map.
 	 * Example: $().addPoint(...);
 	 */
-	addRss: function (rssfile) {
+	addRss: function (rssfile, callback) {
 		var jmap = this[0].jMap;
 		// Yahoo Maps
 		if (jmap._mapType) {
 			var geoXml = new YGeoRSS(rssfile);
+			YEvent.Capture(jmap, EventsList.onEndGeoRSS, callback)
 			return jmap.addOverlay(geoXml);
 		} else if (jmap.b.jMap) {  // Google Maps	
-			var geoXml = new GGeoXml(rssfile);
+			var geoXml = new GGeoXml(rssfile, callback);
 			return jmap.addOverlay(geoXml);
 		}
 		
@@ -293,7 +289,7 @@
 							var results = [];
 							results[0] = e.GeoPoint.Lat;
 							results[1] = e.GeoPoint.Lon;
-							callback(results);
+							return callback(results);
 							break;
 						default:
 							point = new YGeoPoint(e.GeoPoint.Lat,e.GeoPoint.Lon);
@@ -317,7 +313,7 @@
 							var results = [];
 							results[0] = point.y;
 							results[1] = point.x;						
-							callback(results);
+							return callback(results);
 							break;
 						default:
 							jmap.setCenter(point);
@@ -355,7 +351,6 @@
 			minZoomLevel: 6
 		},o);		
 		var adsManager = new GAdsManager(jmap, p, o);
-		console.log(adsManager);
 		adsManager.enable();
 	}
 });
