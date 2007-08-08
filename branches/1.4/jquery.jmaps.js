@@ -10,12 +10,13 @@
  * For support, I can usually be found on the #jquery IRC channel on irc.freenode.net
  * ===============================================================================================================
  * ^^^ Changelog ^^^
- * Version 1.4 (In development)
+ * Version 1.4 (08/08/2007)
  * Added option to double click on map to add marker.  Single click on marker gives Lat/Lng details, while double click removes
  * Moved searchAddress and searchDirections back into main function, can now be called via .searchAddress and .searchDirections, removed options for fields to pass in data
  * Added support for new Google Ad's Manager for Maps.  Can be enabled with .mapAds()
  * Added callback in searchAddress to return as a map, or as an array of Lat/Lng
  * Added callback in addRss
+ * Added passing in custom icon
  * ===============================================================================================================
  * Version 1.3.1 (06/08/2007)
  * Fixed bug with change in Google Maps API
@@ -212,7 +213,7 @@
 	 * Returns a marker to be overlayed on the Google map
 	 * Example: $().addPoint(...);
 	 */
-	addPoint: function(pointlat, pointlng, pointhtml, isdraggable, removable) {
+	addPoint: function(pointlat, pointlng, icon, pointhtml, isdraggable, removable) {
 		var jmap = this[0].jMap;
 		// Yahoo Maps
 		if (jmap._mapType) {			
@@ -228,7 +229,7 @@
 			}
 			jmap.addOverlay(marker);	// Add marker to map
 		} else if (jmap.b.jMap) { // Google Maps
-			var marker = new GMarker(new GLatLng(pointlat,pointlng), { draggable: isdraggable } );
+			var marker = new GMarker(new GLatLng(pointlat,pointlng), icon, { draggable: isdraggable } );
 			GEvent.addListener(marker, "click", function(){
 				marker.openInfoWindowHtml(pointhtml);
 			});
@@ -344,14 +345,23 @@
 		}
 	},
 	mapAds : function (p,o) {
-		var jmap = this[0].jMap;
+		var jmap = this[0].jMap;		
 		var o = jQuery.extend({
 			maxAdsOnMap: 3,
 			channel: "",
 			minZoomLevel: 6
-		},o);		
-		var adsManager = new GAdsManager(jmap, p, o);
-		adsManager.enable();
+		},o);
+		
+		if (jmap._mapType) {
+			alert('Yahoo Maps Do Not Support Map Ads');
+		} else if (jmap.b.jMap) { //Google Maps
+			var adsManager = new GAdsManager(jmap, p, o);
+			adsManager.enable();
+		}	
+	},
+	showTraffic : function() {
+		var jmap = this[0].jMap;
+		jmap.addOverlay(new GTrafficOverlay());
 	}
 });
 })(jQuery);

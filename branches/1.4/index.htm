@@ -24,7 +24,7 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 				$("#gmap2").mapAds('pub-3237221231926969');
 				$('#findaddress').bind('click', function(){
 					$('#gmap').searchAddress($('#Address').val(), {returntype: "object"}, function(e){
-						$('#mydirections').html('Point Found:<br />Lat: ' + e[0] + ',<br /> Lng: ' + e[1] + '<br /><a href="#" class="addPoint" onclick="javascript:$(\'#gmap\').addPoint(\'' + e[0] + '\', \'' + e[1] + '\', \'' + $('#Address').val() + '\', true, true);$(\'#gmap\').myMap().setCenter(new GLatLng(' + e[0] + ', ' + e[1] + '));return false;\">Add Point</a>');
+						$('#mydirections').html('Point Found:<br />Lat: ' + e[0] + ',<br /> Lng: ' + e[1] + '<br /><a href="#" class="addPoint" onclick="javascript:$(\'#gmap\').addPoint(\'' + e[0] + '\', \'' + e[1] + '\', null, \'' + $('#Address').val() + '\', true, true);$(\'#gmap\').myMap().setCenter(new GLatLng(' + e[0] + ', ' + e[1] + '));return false;\">Add Point</a>');
 						$('#foundsofar ul').append('<li>' + e + '</li>');
 						
 					});
@@ -42,6 +42,18 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 				$(showdiv).toggle("fast");
 				return false;
 			});
+			
+			var icon = new GIcon();
+			icon.image = "http://labs.google.com/ridefinder/images/mm_20_red.png";
+			icon.shadow = "http://labs.google.com/ridefinder/images/mm_20_shadow.png";
+			icon.iconSize = new GSize(12, 20);
+			icon.shadowSize = new GSize(22, 20);
+			icon.iconAnchor = new GPoint(6, 20);
+			icon.infoWindowAnchor = new GPoint(5, 1);
+			
+			$('#gmap2').addPoint('39.97501535728991', '-104.82330322265625', null, "This is a Custom Icon");
+
+			
 		});
 	</script>
 	<style type="text/css">
@@ -110,6 +122,16 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 	<a name="changelog"><h2>Changelog</h2></a>
 	
 	<ul>
+		<li>Version 1.4
+		<ul>
+			<li>Added option to double click on map to add marker.  Single click on marker gives Lat/Lng details, while double click removes</li>
+			<li>Moved searchAddress and searchDirections back into main function, can now be called via .searchAddress and .searchDirections, removed options for fields to pass in data</li>
+			<li>Added support for new Google Ad's Manager for Maps.  Can be enabled with .mapAds()</li>
+			<li>Added callback in searchAddress to return as a map, or as an array of Lat/Lng</li>
+			<li>Added callback in addRss</li>
+			<li>Added passing in custom icon</li>
+		</ul>
+		</li>
 		<li>Version 1.3
 			<ul>
 				<li>Added support for creating Yahoo! Maps, can create Map, Satallite or Hybrid.</li>
@@ -163,12 +185,7 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 	</p>
 	<p>
 		<strong>To Do</strong>
-		<ul>
-			<li>Add in custom icon support for points.</li>
-			<li>Add support for Google Points Manager</li>
-			<li>Add support for overlays</li>
-		</ul>
-		Don't see anything here you would like, add it to the <a href="http://code.google.com/p/jmaps/issues/list">Wishlist</a>
+		<a href="http://code.google.com/p/jmaps/wiki/Version2">Version 2 Roadmap</a>
 	</p>
 	
 	<a name="useage"><h2>Useage</h2></a>
@@ -237,25 +254,20 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		<code class="mix">
 			$('document').ready(function(){ 
 				$('#gmap').jmap({
-					provider: "google",		// can be "google" or "yahoo"
-			        maptype: "hybrid",		// can be "map", "sat" or "hybrid"
-			        center: [55.958858,-3.162302],	// G + Y
-			        zoom: 12,				// G + Y
-			        controlsize: "small",	// G + Y
-			        showtype: true,			// G + Y
-			        showzoom: true,			// Y
-			        showpan: true,			// Y
-					showoverview: true,		// G
-					showscale: true,		// Y
-					dragging: true,			// G + Y
-					scrollzoom: false,		// G + Y
-					smoothzoom: true,		// G
-					searchfield: "#Address",
-					searchbutton: "#findaddress",
-					directionsto: "#to",
-					directionsfrom: "#from",
-					directionsfind: "#getDirections",
-					directionspanel: "myDirections"
+						provider: "google",		// can be "google" or "yahoo"
+						maptype: "hybrid",		// can be "map", "sat" or "hybrid"
+						center: [55.958858,-3.162302],	// G + Y
+						zoom: 12,				// G + Y
+						controlsize: "small",	// G + Y
+						showtype: true,			// G + Y
+						showzoom: true,			// Y
+						showpan: true,			// Y
+						showoverview: true,		// G
+						showscale: true,		// Y
+						dragging: true,			// G + Y
+						scrollzoom: false,		// G + Y
+						smoothzoom: true,		// G
+						clickmarker: true		// G
 				},settings);
 				});
 			});
@@ -270,13 +282,14 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		<a class="showcode" href="#addpoint">Show Code</a>
 		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="addpoint">
 		<code class="mix">
-				$('#gmap').addPoint('55.948286','-3.200111', 'Point1', false, false);
+				$('#gmap').addPoint('55.948286','-3.200111', null, 'Point1', false, false);
 		</code>
 		</pre>
 	</p>
 	<ul>
 		<li>Latitude: Decimel</li>
 		<li>Longitude: Decimel</li>
+		<li>Custom Icon</li>
 		<li>Bubble HTML: Text</li>
 		<li>Draggable: Boolean</li>
 		<li>Deleteable: Boolean (To delete, double click the point)</li>
@@ -308,6 +321,43 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 				$('a.addpoly').bind('click', function(){
 					$('#gmap').addPoly(polyline);
 				});
+		</code>
+		</pre>
+	</p>
+	<h3>Custom Icons</h3>
+	<p>
+		You can pass in a custom icon to your map
+	</p>
+	<p>
+		<a class="showcode" href="#customicon">Show Code</a>
+		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="customicon">
+		<code class="mix">
+				var icon = new GIcon();
+				icon.image = "http://labs.google.com/ridefinder/images/mm_20_red.png";
+				icon.shadow = "http://labs.google.com/ridefinder/images/mm_20_shadow.png";
+				icon.iconSize = new GSize(12, 20);
+				icon.shadowSize = new GSize(22, 20);
+				icon.iconAnchor = new GPoint(6, 20);
+				icon.infoWindowAnchor = new GPoint(5, 1);
+			
+				$('#gmap2').addPoint('39.97501535728991', '-104.82330322265625', null, "This is a Custom Icon");
+		</code>
+		</pre>
+	</p>
+	<h3>Search Address</h3>
+	<p>
+		To search an address, you can now pass it into a method, that returns either a mapsearch or array with lat/lng details.
+		The function also accepts a callback.  The below code for example would grab the address from a input field and return
+		it as an object, I then create a link to add the point to the map.
+	<p>
+		<a class="showcode" href="#renderkml">Show Code</a>
+		<pre style="background-color:#aaa;border:2px solid #000;display:none" id="renderkml">
+		<code class="mix">
+				$('#gmap').searchAddress($('#Address').val(), {returntype: "object"}, function(e){
+						$('#mydirections').html('Point Found:<br />Lat: ' + e[0] + ',<br /> Lng: ' + e[1] + '<br /><a href="#" class="addPoint" onclick="javascript:$(\'#gmap\').addPoint(\'' + e[0] + '\', \'' + e[1] + '\', null, \'' + $('#Address').val() + '\', true, true);$(\'#gmap\').myMap().setCenter(new GLatLng(' + e[0] + ', ' + e[1] + '));return false;\">Add Point</a>');
+						$('#foundsofar ul').append('<li>' + e + '</li>');
+						
+					});
 		</code>
 		</pre>
 	</p>
@@ -367,10 +417,9 @@ xmlns:v="urn:schemas-microsoft-com:vml">
 		A hotel is an establishment that provides paid lodging, usually on a short-term basis. Hotels often provide a number of additional guest services such as a restaurant, a swimming pool or childcare. Some hotels have conference services and meeting rooms and encourage groups to hold conventions and meetings at their location. In Australia, the word may also refer to a pub or bar. In the UK similarly, many pubs with "hotel" in their name do not offer accommodation or even food. In India, the word may also refer to a restaurant since the best restaurants were always situated next to a good hotel. The word hotel derives from the French hô, which referred to a French version of a townhouse or any other building seeing frequent visitors, not a place offering accommodation (in contemporary usage, hô has the meaning of "hotel", and hô particulier is used for the old meaning). The French spelling (with the circumflex) was once also used in English, but is now rare. The circumflex replaces the 's' once preceding the 't' in the earlier hostel spelling, which over time received a new, but closely related meaning.
 	</p>
 	<a name="download"><h2>Download</h2></a>
-		<strong>jQuery Google Map Application Version 1.3.1</strong>
+		<strong>jQuery Google Map Application Version 1.4</strong>
 		<ul>
-		<li><a href="http://jmaps.googlecode.com/files/jquery.jmaps.1-3-1.js">Unpacked Version</a></li>
-		<li><a href="http://jmaps.googlecode.com/files/jquery.jmaps.packed.1-3-1.js">Packed Version</a></li>
+		<li><a href="http://jmaps.googlecode.com/files/jquery.jmaps.1.4.js">Unpacked Version</a></li>
 		</ul>
 	</body>
 </html>
