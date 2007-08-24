@@ -213,6 +213,7 @@
 						google.maps.Event.addListener(marker, "dragend", function(pointlocation){
 							marker.openInfoWindowHtml("Latitude: " + pointlocation.lat() + "<br />Longitude: " + pointlocation.lng());			
 						});
+						return callback;
 						break;
 				}
 			}
