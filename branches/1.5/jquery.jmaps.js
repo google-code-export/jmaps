@@ -218,10 +218,10 @@
 	searchDirections : function(from,to,panel) {
 			var jmap = this[0].jMap;
 			var dirpanel = document.getElementById(panel);
-			search = new GDirections(jmap, dirpanel);
-			from = from.replace(/\s+/g, '+');
-			to = to.replace(/\s+/g, '+');
-			search.load('from:' + from + ' to:' + to);
+			directions = new GDirections(jmap, dirpanel);
+			//from = from.replace(/\s+/g, '+');
+			//to = to.replace(/\s+/g, '+');
+			directions.load(from + '  to ' + to);
 	},
 	mapAds : function (p,o) {
 		var jmap = this[0].jMap;		
