@@ -185,6 +185,8 @@
 			var settings = $.extend({
 				returntype: "map"	//Return as Map or a Object
 			},settings);
+			
+			address = address.replace(/\s+/g, '+');
 	
 			var jmap = this[0].jMap;
 			GGeocoder = new GClientGeocoder();
@@ -217,6 +219,8 @@
 			var jmap = this[0].jMap;
 			var dirpanel = document.getElementById(panel);
 			search = new GDirections(jmap, dirpanel);
+			from = from.replace(/\s+/g, '+');
+			to = to.replace(/\s+/g, '+');
 			search.load('from:' + from + ' to:' + to);
 	},
 	mapAds : function (p,o) {

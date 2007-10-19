@@ -10,10 +10,12 @@
   </head>
   <body>
     <div id="map" style="width: 500px; height: 300px"></div>
+	<div id="direction" style="width: 500px; height: 600px"></div>
 	
 	<script type="text/javascript">
 		(function($){
 			$('#map').jmap();
+			$("#map").searchDirections("20 Dalgety Avenue, Edinburgh","62 Long Craigs Terrace, Kinghorn",'#direction');
 		})(jQuery);
 	</script>
 	
