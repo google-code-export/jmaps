@@ -1,6 +1,13 @@
 #labels Featured,Versions
 #This page contains information about versions starting with r59
 
+== r61 ==
+Put helper functions into Mapifies namespace.  This now means you call these functions like this:
+{{{
+var valid = Mapifies.SearchCode(result.getStatus());
+}}}
+Updated demos and documentation
+
 == r59 ==
 
 Release of new API version with full API docs at [http://map.ifies.org]
