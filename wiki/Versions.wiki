@@ -1,0 +1,6 @@
+#labels Featured,Versions
+#This page contains information about versions starting with r59
+
+== r59 ==
+
+Release of new API version with full API docs at [http://map.ifies.org]
