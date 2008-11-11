@@ -1,13 +1,18 @@
 #labels Featured,Versions
 #This page contains information about versions starting with r59
 
+== r64 ==
+  * Added the 'centerMoveMethod' to the Mapifies.AddMarker method.
+  * Updated the 'init' callback to now include the map.  The order is 'thisMap', 'element', 'options'
+  * Added an example to show using GEvent within jMaps code.
+
 == r61 ==
-Put helper functions into Mapifies namespace.  This now means you call these functions like this:
+  * Put helper functions into Mapifies namespace.  This now means you call these functions like this:
 {{{
 var valid = Mapifies.SearchCode(result.getStatus());
 }}}
-Updated demos and documentation
+  * Updated demos and documentation
 
 == r59 ==
 
-Release of new API version with full API docs at [http://map.ifies.org]
+  * Release of new API version with full API docs at [http://map.ifies.org]
