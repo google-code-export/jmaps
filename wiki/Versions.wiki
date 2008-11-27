@@ -2,7 +2,7 @@
 #This page contains information about versions starting with r59
 
 == r69 ==
-  * Added the CheckResize function and demo, allows for more dynamic maps
+  * Added the CheckResize function and demo, allows for more dynamic maps (thanks to Cyrille Heulland for the suggestion)
 
 == r64 ==
   * Added the 'centerMoveMethod' to the Mapifies.AddMarker method.
