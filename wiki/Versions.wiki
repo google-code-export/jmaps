@@ -1,6 +1,9 @@
 #labels Featured,Versions
 #This page contains information about versions starting with r59
 
+== r69 ==
+  * Added the CheckResize function and demo, allows for more dynamic maps
+
 == r64 ==
   * Added the 'centerMoveMethod' to the Mapifies.AddMarker method.
   * Updated the 'init' callback to now include the map.  The order is 'thisMap', 'element', 'options'
