@@ -1,6 +1,9 @@
 #labels Featured,Versions
 #This page contains information about versions starting with r59
 
+== r72 ==
+  * Added MarkerManager support for the open source marker manager (see docs)
+
 == r69 ==
   * Added the CheckResize function and demo, allows for more dynamic maps (thanks to Cyrille Heulland for the suggestion)
 
