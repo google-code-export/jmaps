@@ -6,8 +6,7 @@
   * Added the SetMapType function to accept map type constants
 
 == r74 ==
-  * Removed GetMapType function for initialisation, and instead require the constant
-of the maptype.  Allows support for custom map types.
+  * Removed GetMapType function for initialisation, and instead require the constant of the maptype.  Allows support for custom map types.
 
 == r72 ==
   * Added MarkerManager support for the open source marker manager (see docs)
