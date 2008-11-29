@@ -1,6 +1,14 @@
 #labels Featured,Versions
 #This page contains information about versions starting with r59
 
+== r75 ==
+  * Added the AddCopyright function to support the creation of new map types
+  * Added the SetMapType function to accept map type constants
+
+== r74 ==
+  * Removed GetMapType function for initialisation, and instead require the constant
+of the maptype.  Allows support for custom map types.
+
 == r72 ==
   * Added MarkerManager support for the open source marker manager (see docs)
 
