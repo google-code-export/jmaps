@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/
+    xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+	<head>
+		<title>{{ appName }}</title>
+		<link rel="stylesheet" media="screen" href="css/main.css" />
+	</head>
+	
+	<body>
+		<div id="wrapper">
+			<div id="header">
+				<h1><a href="/"><span>jMaps Demos</span></a></h1>
+			</div>
+		</div>
+		
+		<div id="inner-wrap">
+			
+			<div id="sidebar">
+				<div id="results">
+					jMaps is using <a href="http://{{service}}">{{service}}</a> to geocode
+					your position from your IP address ({{userip}})
+				</div>
+				<p></p>
+				<ul>
+					<li class="parent">
+						<a href="/api">API Documentation</a>
+						<ul>
+							<li><a href="#">Google.Address</a></li>
+							<li><a href="#">Google.AdsManager</a></li>
+							<li><a href="#">Google.Core</a></li>
+							<li><a href="#">Google.GeoXML</a></li>
+							<li><a href="#">Google.GroundOverlay</a></li>
+							<li><a href="#">Google.Markers</a></li>
+							<li><a href="#">Google.Polygon</a></li>
+							<li><a href="#">Google.Polyline</a></li>
+							<li><a href="#">Google.ScreenOverlay</a></li>
+							<li><a href="#">Google.StreetView</a></li>
+							<li><a href="#">Google.Traffic</a></li>
+							<li><a href="#">Mapifies.Helpers</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			
+			<div id="main">{% block main %}{% endblock main %}</div>
+			
+		</div>
+		
+	</body>
+	<!-- Live Key: ABQIAAAApCYnM8S-TSRBhQk16Ynr4BS4LS60o3fxWujl99YbdGspj7dweBQE0cGUZYHRHQsW2jrtml5zTXg4kg -->
+	<!-- Dev Key: ABQIAAAApCYnM8S-TSRBhQk16Ynr4BTwM0brOpm-All5BF6PoaKBxRWWERRst-9cb6RfsSkGI6AMDORR3uoYXQ -->
+	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAApCYnM8S-TSRBhQk16Ynr4BS4LS60o3fxWujl99YbdGspj7dweBQE0cGUZYHRHQsW2jrtml5zTXg4kg" type="text/javascript"></script>
+	<script type="text/javascript" src="js/jquery-1.2.6.min.js"></script>
+	<script type="text/javascript" src="js/jquery.jmap.min-r72.js"></script>
+	{% block scripts %}{% endblock scripts %}
+</html>

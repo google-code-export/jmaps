@@ -1,0 +1,15 @@
+{% extends "../base.html" %}
+
+{% block main %}
+<div id="map" class="jmap"></div>
+{% endblock main %}
+
+{% block scripts %}
+<script type="text/javascript">
+	jQuery(document).ready(function(){
+		jQuery('#map').jmap('init', {
+			'mapCenter': [{{results.longitude}}, {{results.latitude}}]
+		})
+	});
+</script>
+{% endblock scripts %}
