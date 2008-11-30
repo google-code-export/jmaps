@@ -1,55 +1,196 @@
 {% extends "../base.html" %}
 
 {% block main %}
-<div id="map" class="jmap"></div>
+<div id="map" class="jmap-small-left"></div>
+<div id="control-panel">
+	<div id="message-area">
+		
+	</div>
+	<table>
+		<tbody>
+			<tr>
+				<th scope="row"><label for="change-map-type">Map Type</label></th>
+				<td scope="row">
+					<select id="change-map-type" class="change-map-type">
+						<option value="G_NORMAL_MAP">Earth: Normal Map</option>
+						<option value="G_SATELLITE_MAP">Earth: Satellite Map</option>
+						<option value="G_HYBRID_MAP">Earth: Hybrid Map</option>
+						<option value="G_PHYSICAL_MAP">Earth: Physical Map</option>
+						<option value="G_MOON_ELEVATION_MAP">Moon: Elevation Map</option>
+						<option value="G_MOON_VISIBLE_MAP">Moon: Visible Map</option>
+						<option value="G_MARS_ELEVATION_MAP">Mars: Elevation Map</option>
+						<option value="G_MARS_VISIBLE_MAP">Mars: Visible Map</option>
+						<option value="G_MARS_INFRARED_MAP">Mars: Infrared Map</option>
+						<option value="G_SKY_VISIBLE_MAP">Sky: Visible Map</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">Map Controls</th>
+				<td scope="row">
+					<table>
+						<tbody>
+							<tr>
+								<th scope="row">Main Control Size</th>
+								<td scope="row">
+									<select id="map-control-type" name="map-control-type">
+										<option value="null">None</option>
+										<option value="GSmallMapControl">Small</option>
+										<option value="GLargeMapControl">Large</option>
+									</select>
+								</td>
+								<tr>
+									<th scope="row">Map Type Control</th>
+									<td scope="row">
+										<input type="checkbox" name="map-type-toggle" id="map-type-toggle" />
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">Map Overview Control</th>
+									<td scope="row">
+										<input type="checkbox" name="map-overview-toggle" id="map-overview-toggle" />
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">Map Scale Control</th>
+									<td scope="row">
+										<input type="checkbox" name="map-scale-toggle" id="map-scale-toggle" />
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">Map Dragging</th>
+									<td scope="row">
+										<input type="checkbox" checked="checked" name="map-dragging-toggle" id="map-dragging-toggle" />
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">Google Search Bar</th>
+									<td scope="row">
+										<input type="checkbox" name="map-search-toggle" id="map-search-toggle" />
+									</td>
+								</tr>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
 {% endblock main %}
 
 {% block scripts %}
 <script type="text/javascript">
 	jQuery(document).ready(function(){
-		var mapCenter = [];
+		var generalTimeout = 4000;
 		
-		if( !navigator.geolocation ){
-			jQuery('#map').jmap('init', {
-				'mapCenter': [{{results.longitude}}, {{results.latitude}}]
-			});
-			findAddressForPoint([{{results.longitude}}, {{results.latitude}}]);
-			return;
+		var geocoderType;
+		var mapCenter = [];
+		var output = [];
+		var debug = false; var sizeControl; var typeControl = new GMapTypeControl();
+		var overviewControl = new GOverviewMapControl(); var scaleControl = new GScaleControl();
+		
+		var geoCoder = demos.getGeoLocationMethod(false);
+		if (geoCoder) {
+			jQuery.jGrowl('Using W3C/Geode/Gears Geocoder.  Please click the bar above to set location', {'header': 'jMaps Mapping Demo', 'life': generalTimeout + 3000});
+			geoCoder.getCurrentPosition(function(point){
+				mapCenter = [point.latitude, point.longitude];
+				demos.createMap('#map', mapCenter, onInit);
+			}, function(error){
+				var errorResult = demos.errorHandler(error);
+				jQuery('#message-area').html('<p>' + errorResult + '</p>');
+				geocoderType = '{{service}}';
+				mapCenter = [{{results.longitude}}, {{results.latitude}}];
+				demos.createMap('#map', mapCenter, onInit);
+			}, {'enableHighAccuracy': true, 'maximumAge':600, 'timeout':10});
 		} else {
-			jQuery("#results").hide();
-			navigator.geolocation.getCurrentPosition(function(pos){
-				console.log(pos);
-				jQuery('#map').jmap('init', {
-					'mapCenter': [pos.latitude, pos.longitude]
-				});
-				findAddressForPoint([pos.latitude, pos.longitude]);
-			}, function(){
-				jQuery('#map').jmap('init', {
-					'mapCenter': [{{results.longitude}}, {{results.latitude}}]
-				});
-				findAddressForPoint([{{results.longitude}}, {{results.latitude}}]);
-				jQuery("#results").html('There has been an error, falling back to IP based location.').show();
-			});
+			jQuery.jGrowl('Using {{service}} Geocoder', {'header': 'jMaps Mapping Demo', 'life': generalTimeout});
+			geocoderType = '{{service}}';
+			mapCenter = [{{results.longitude}}, {{results.latitude}}];
+			demos.createMap('#map', mapCenter, onInit);
 		}
 		
-		function findAddressForPoint(mapCenter) {
-			jQuery('#map').jmap('SearchAddress', {
-	        'query': new GLatLng(mapCenter[0], mapCenter[1]),
-	        'returnType': 'getLocations'
-	    }, function(result, options) {
-				var valid = Mapifies.SearchCode(result.Status.code);
-				if (valid.success) {
-					jQuery.each(result.Placemark, function(i, point){
-						jQuery('#map').jmap('AddMarker',{
-							'pointLatLng':[point.Point.coordinates[1], point.Point.coordinates[0]],
-							'pointHTML':point.address
-						});
-					});
-				} else {
-					jQuery('#results').val(valid.message);
+		
+		function onInit(map, element, options) {
+			jQuery.jGrowl('We have determined your location as ' + mapCenter[0] + ',' + mapCenter[1] + '.  Localising map', {'header': 'jMaps Mapping Demo', 'life': generalTimeout});			
+			jQuery('#change-map-type').change(function(){
+				var mapType = jQuery('option:selected', this).val();
+				jQuery(element).jmap('SetMapType', mapType);
+			});	
+			
+			jQuery('#map-control-type').change(function(){
+				map.removeControl(sizeControl);
+				var control = jQuery('option:selected', this).val();
+				if (control !== 'null') {
+					sizeControl = new window[control]();
+					map.addControl(sizeControl);
 				}
 			});
-		};
+			
+			jQuery('#map-type-toggle').change(function(){
+				var control = jQuery(this).is(':checked');
+				if (control) {
+					map.addControl(typeControl);
+				} else {
+					map.removeControl(typeControl);	
+				}
+			});
+			
+			jQuery('#map-overview-toggle').change(function(){
+				var control = jQuery(this).is(':checked');
+				if (control) {
+					map.addControl(overviewControl);
+				} else {
+					map.removeControl(overviewControl);	
+				}
+			});
+			
+			jQuery('#map-scale-toggle').change(function(){
+				var control = jQuery(this).is(':checked');
+				if (control) {
+					map.addControl(scaleControl);
+				} else {
+					map.removeControl(scaleControl);	
+				}
+			});
+			
+			jQuery('#map-dragging-toggle').change(function(){
+				var control = jQuery(this).is(':checked');
+				if (control) {
+					map.enableDragging();
+				} else {
+					map.disableDragging();
+				}
+			});
+			
+			jQuery('#map-search-toggle').change(function(){
+				var control = jQuery(this).is(':checked');
+				if (control) {
+					map.enableGoogleBar();
+				} else {
+					map.disableGoogleBar();
+				}
+			});
+			var locations = demos.createLocations(mapCenter);
+			if (debug) {
+				jQuery.each(locations, function(i, item){
+					jQuery(element).jmap('AddMarker', {
+						'pointLatLng' : [item[0], item[1]]
+					});
+				});
+			}
+			
+			GEvent.addListener(map, "click", function(overlay, latlng){
+				var string = "You clicked " + latlng.lat() + ', ' + latlng.lng();
+				var hit = demos.determineHit(latlng, locations);
+				if (hit) {
+					jQuery(element).jmap('AddMarker', {
+						'pointLatLng' : [latlng.lat(), latlng.lng()]
+					});
+				}
+			});
+			
+		}
 	});
 </script>
 {% endblock scripts %}

@@ -22,19 +22,23 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import urlfetch
 from xml.dom import minidom
 
-debug = True
+debug = False
 
 class MainHandler(webapp.RequestHandler):        
   def get(self):
+  	
     userip = self.request.remote_addr
-    if userip == "127.0.0.1":
-      userip = "78.86.108.213"
+    
+    #if userip == "127.0.0.1":
+    #  userip = "78.86.108.213"
+
     service = 'infosniper.net'
     url = "http://www.infosniper.net/xml.php?ip_address=%s" % (userip)
     result = urlfetch.fetch(url)
+    
     if result.status_code == 200:
       dom = minidom.parseString(result.content)
-      if not ('Quota exceeded' in dom.firstChild.getElementsByTagName( 'ipaddress' )[0].firstChild.data or debug):
+      if not ('Quota exceeded' in dom.firstChild.getElementsByTagName( 'hostname' )[0].firstChild.data or debug):
         results = {
           'ipaddress': dom.firstChild.getElementsByTagName( 'ipaddress' )[0].firstChild.data,
           'hostname': dom.firstChild.getElementsByTagName( 'hostname' )[0].firstChild.data,

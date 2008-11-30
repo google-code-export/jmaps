@@ -42,7 +42,19 @@ div#main {
 }
 
 div.jmap {
-	width: 500px;
-	height: 500px;
+	width: 400px;
+	height: 400px;
 	margin: 0 auto;
+}
+
+div.jmap-small-left {
+	width: 400px;
+	height: 400px;
+	float:left;
+	margin-right: 20px;
+}
+
+div#control-panel {
+	float:left;
+	width: 400px;
 }
