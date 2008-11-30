@@ -7,9 +7,49 @@
 {% block scripts %}
 <script type="text/javascript">
 	jQuery(document).ready(function(){
-		jQuery('#map').jmap('init', {
-			'mapCenter': [{{results.longitude}}, {{results.latitude}}]
-		})
+		var mapCenter = [];
+		
+		if( !navigator.geolocation ){
+			jQuery('#map').jmap('init', {
+				'mapCenter': [{{results.longitude}}, {{results.latitude}}]
+			});
+			findAddressForPoint([{{results.longitude}}, {{results.latitude}}]);
+			return;
+		} else {
+			jQuery("#results").hide();
+			navigator.geolocation.getCurrentPosition(function(pos){
+				console.log(pos);
+				jQuery('#map').jmap('init', {
+					'mapCenter': [pos.latitude, pos.longitude]
+				});
+				findAddressForPoint([pos.latitude, pos.longitude]);
+			}, function(){
+				jQuery('#map').jmap('init', {
+					'mapCenter': [{{results.longitude}}, {{results.latitude}}]
+				});
+				findAddressForPoint([{{results.longitude}}, {{results.latitude}}]);
+				jQuery("#results").html('There has been an error, falling back to IP based location.').show();
+			});
+		}
+		
+		function findAddressForPoint(mapCenter) {
+			jQuery('#map').jmap('SearchAddress', {
+	        'query': new GLatLng(mapCenter[0], mapCenter[1]),
+	        'returnType': 'getLocations'
+	    }, function(result, options) {
+				var valid = Mapifies.SearchCode(result.Status.code);
+				if (valid.success) {
+					jQuery.each(result.Placemark, function(i, point){
+						jQuery('#map').jmap('AddMarker',{
+							'pointLatLng':[point.Point.coordinates[1], point.Point.coordinates[0]],
+							'pointHTML':point.address
+						});
+					});
+				} else {
+					jQuery('#results').val(valid.message);
+				}
+			});
+		};
 	});
 </script>
 {% endblock scripts %}
