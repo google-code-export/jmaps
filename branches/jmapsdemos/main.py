@@ -22,7 +22,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import urlfetch
 from xml.dom import minidom
 
-debug = False
+debug = True
 
 class MainHandler(webapp.RequestHandler):        
   def get(self):

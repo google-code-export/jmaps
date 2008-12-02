@@ -94,25 +94,39 @@
 		if (geoCoder) {
 			jQuery.jGrowl('Using W3C/Geode/Gears Geocoder.  Please click the bar above to set location', {'header': 'jMaps Mapping Demo', 'life': generalTimeout + 3000});
 			geoCoder.getCurrentPosition(function(point){
-				mapCenter = [point.latitude, point.longitude];
+			  mapCenter = [point.latitude, point.longitude];
+			  jQuery.jGrowl('We have determined your location as ' + mapCenter[0] + ',' + mapCenter[1] + '.  Localising map', {'header': 'jMaps Mapping Demo', 'life': generalTimeout});
 				demos.createMap('#map', mapCenter, onInit);
 			}, function(error){
 				var errorResult = demos.errorHandler(error);
-				jQuery('#message-area').html('<p>' + errorResult + '</p>');
-				geocoderType = '{{service}}';
-				mapCenter = [{{results.longitude}}, {{results.latitude}}];
-				demos.createMap('#map', mapCenter, onInit);
+				jQuery.jGrowl(errorResult, {'header': 'jMaps Mapping Demo', 'life': generalTimeout});
+        demos.fetchLocationByIp({}, function(data,success) {
+          if (data) {
+            mapCenter = [data[0], data[1]];
+            demos.createMap('#map', mapCenter, onInit);
+          } else {
+            jQuery.jGrowl('Failed to determine your location.  Defaulting to Palo Alto', {'header': 'jMaps Mapping Demo', 'life': generalTimeout});
+            mapCenter = [37.4419, -122.1419];
+            demos.createMap('#map', mapCenter, onInit);
+          }
+        });
 			}, {'enableHighAccuracy': true, 'maximumAge':600, 'timeout':10});
 		} else {
-			jQuery.jGrowl('Using {{service}} Geocoder', {'header': 'jMaps Mapping Demo', 'life': generalTimeout});
-			geocoderType = '{{service}}';
-			mapCenter = [{{results.longitude}}, {{results.latitude}}];
-			demos.createMap('#map', mapCenter, onInit);
+			jQuery.jGrowl('Falling back to IP-based location', {'header': 'jMaps Mapping Demo', 'life': generalTimeout});
+      demos.fetchLocationByIp({}, function(data) {
+        if (data) {
+          mapCenter = [data[0], data[1]];
+          demos.createMap('#map', mapCenter, onInit);
+        } else {
+          jQuery.jGrowl('Failed to determine your location.  Defaulting to Palo Alto', {'header': 'jMaps Mapping Demo', 'life': generalTimeout});
+          mapCenter = [37.4419, -122.1419];
+          demos.createMap('#map', mapCenter, onInit);
+        }
+      });
 		}
 		
 		
 		function onInit(map, element, options) {
-			jQuery.jGrowl('We have determined your location as ' + mapCenter[0] + ',' + mapCenter[1] + '.  Localising map', {'header': 'jMaps Mapping Demo', 'life': generalTimeout});			
 			jQuery('#change-map-type').change(function(){
 				var mapType = jQuery('option:selected', this).val();
 				jQuery(element).jmap('SetMapType', mapType);
@@ -171,6 +185,7 @@
 					map.disableGoogleBar();
 				}
 			});
+			/*
 			var locations = demos.createLocations(mapCenter);
 			if (debug) {
 				jQuery.each(locations, function(i, item){
@@ -189,7 +204,7 @@
 					});
 				}
 			});
-			
+			*/
 		}
 	});
 </script>

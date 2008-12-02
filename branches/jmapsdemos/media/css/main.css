@@ -34,11 +34,8 @@ div#sidebar {
 }
 
 div#main {
-	float:right;
 	position: relative;
 	top:0;
-	right:0;
-	width:78%;
 }
 
 div.jmap {
@@ -56,5 +53,4 @@ div.jmap-small-left {
 
 div#control-panel {
 	float:left;
-	width: 400px;
 }

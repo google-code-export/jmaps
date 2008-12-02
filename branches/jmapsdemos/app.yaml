@@ -10,5 +10,7 @@ handlers:
   static_dir: media/images
 - url: /js
   static_dir: media/js
+- url: /geocode
+  script: geocode.py
 - url: .*
   script: main.py
