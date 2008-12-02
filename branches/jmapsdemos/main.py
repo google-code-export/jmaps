@@ -27,58 +27,58 @@ debug = True
 class MainHandler(webapp.RequestHandler):        
   def get(self):
   	
-    userip = self.request.remote_addr
+    #userip = self.request.remote_addr
     
     #if userip == "127.0.0.1":
     #  userip = "78.86.108.213"
 
-    service = 'infosniper.net'
-    url = "http://www.infosniper.net/xml.php?ip_address=%s" % (userip)
-    result = urlfetch.fetch(url)
+    #service = 'infosniper.net'
+    #url = "http://www.infosniper.net/xml.php?ip_address=%s" % (userip)
+    #result = urlfetch.fetch(url)
     
-    if result.status_code == 200:
-      dom = minidom.parseString(result.content)
-      if not ('Quota exceeded' in dom.firstChild.getElementsByTagName( 'hostname' )[0].firstChild.data or debug):
-        results = {
-          'ipaddress': dom.firstChild.getElementsByTagName( 'ipaddress' )[0].firstChild.data,
-          'hostname': dom.firstChild.getElementsByTagName( 'hostname' )[0].firstChild.data,
-          'provider': dom.firstChild.getElementsByTagName( 'provider' )[0].firstChild.data,
-          'country': dom.firstChild.getElementsByTagName( 'country' )[0].firstChild.data,
-          'countrycode': dom.firstChild.getElementsByTagName( 'countrycode' )[0].firstChild.data,
-          'countryflag': dom.firstChild.getElementsByTagName( 'countryflag' )[0].firstChild.data,
-          'state': dom.firstChild.getElementsByTagName( 'state' )[0].firstChild.data,
-          'city': dom.firstChild.getElementsByTagName( 'city' )[0].firstChild.data,
-          'areacode': dom.firstChild.getElementsByTagName( 'areacode' )[0].firstChild.data,
-          'postalcode': dom.firstChild.getElementsByTagName( 'postalcode' )[0].firstChild.data,
-          'dmacode': dom.firstChild.getElementsByTagName( 'dmacode' )[0].firstChild.data,
-          'latitude': dom.firstChild.getElementsByTagName( 'latitude' )[0].firstChild.data,
-          'longitude': dom.firstChild.getElementsByTagName( 'longitude' )[0].firstChild.data,
-          'queries': dom.firstChild.getElementsByTagName( 'queries' )[0].firstChild.data,
-        }
-      else:
-        service = "hostip.info"
-        url = "http://api.hostip.info/?ip=%s" % (userip) 
-        result = urlfetch.fetch(url)
-        if result.status_code == 200:
-          dom = minidom.parseString(result.content)
-          data = minidom.parseString(dom.firstChild.toxml())
-          data = minidom.parseString(data.firstChild.toxml())
-          coords = data.firstChild.getElementsByTagName( 'gml:coordinates' )[0].firstChild.data
-          coords = coords.split(',')
-          results = {
-            'city': data.firstChild.getElementsByTagName( 'gml:name' )[0].firstChild.data,
-            'country': data.firstChild.getElementsByTagName( 'countryName' )[0].firstChild.data,
-            'countrycode': data.firstChild.getElementsByTagName( 'countryAbbrev' )[0].firstChild.data,
-            'latitude': coords[0],
-            'longitude': coords[1],
-          }
+    #if result.status_code == 200:
+    #  dom = minidom.parseString(result.content)
+    #  if not ('Quota exceeded' in dom.firstChild.getElementsByTagName( 'hostname' )[0].firstChild.data or debug):
+    #    results = {
+    #      'ipaddress': dom.firstChild.getElementsByTagName( 'ipaddress' )[0].firstChild.data,
+    #      'hostname': dom.firstChild.getElementsByTagName( 'hostname' )[0].firstChild.data,
+    #      'provider': dom.firstChild.getElementsByTagName( 'provider' )[0].firstChild.data,
+    #      'country': dom.firstChild.getElementsByTagName( 'country' )[0].firstChild.data,
+    #      'countrycode': dom.firstChild.getElementsByTagName( 'countrycode' )[0].firstChild.data,
+    #      'countryflag': dom.firstChild.getElementsByTagName( 'countryflag' )[0].firstChild.data,
+    #      'state': dom.firstChild.getElementsByTagName( 'state' )[0].firstChild.data,
+    #      'city': dom.firstChild.getElementsByTagName( 'city' )[0].firstChild.data,
+    #      'areacode': dom.firstChild.getElementsByTagName( 'areacode' )[0].firstChild.data,
+    #      'postalcode': dom.firstChild.getElementsByTagName( 'postalcode' )[0].firstChild.data,
+    #      'dmacode': dom.firstChild.getElementsByTagName( 'dmacode' )[0].firstChild.data,
+    #      'latitude': dom.firstChild.getElementsByTagName( 'latitude' )[0].firstChild.data,
+    #      'longitude': dom.firstChild.getElementsByTagName( 'longitude' )[0].firstChild.data,
+    #      'queries': dom.firstChild.getElementsByTagName( 'queries' )[0].firstChild.data,
+    #    }
+    #  else:
+    #    service = "hostip.info"
+    #    url = "http://api.hostip.info/?ip=%s" % (userip) 
+    #    result = urlfetch.fetch(url)
+    #    if result.status_code == 200:
+    #      dom = minidom.parseString(result.content)
+    #      data = minidom.parseString(dom.firstChild.toxml())
+    #      data = minidom.parseString(data.firstChild.toxml())
+    #      coords = data.firstChild.getElementsByTagName( 'gml:coordinates' )[0].firstChild.data
+    #      coords = coords.split(',')
+    #      results = {
+    #        'city': data.firstChild.getElementsByTagName( 'gml:name' )[0].firstChild.data,
+    #        'country': data.firstChild.getElementsByTagName( 'countryName' )[0].firstChild.data,
+    #        'countrycode': data.firstChild.getElementsByTagName( 'countryAbbrev' )[0].firstChild.data,
+    #        'latitude': coords[0],
+    #        'longitude': coords[1],
+    #      }
     path = os.path.join(os.path.dirname(__file__), 'templates/homepage/index.html')
     
     template_values = {
-        'appName': 'jMaps Demos',
-        'userip': userip,
-        'results': results,
-        'service':service
+    #    'appName': 'jMaps Demos',
+    #    'userip': userip,
+    #    'results': results,
+    #    'service':service
     }
     self.response.out.write(template.render(path, template_values))
 
