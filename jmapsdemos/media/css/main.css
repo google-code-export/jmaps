@@ -1,0 +1,56 @@
+body {
+	background: #ccc;
+	font: 98% Arial, Helvetica, sans-serif;
+}
+
+div#wrapper {
+	width: 960px;
+	margin:0 auto;
+}
+
+div#header h1 a {
+	display:block;
+	background: url('/images/jmaps-title.png') no-repeat top left;
+	width:193px;
+	height: 99px;
+}
+
+div#header h1 a span {
+	display:none;
+}
+
+
+div#inner-wrap {
+	width: 98%;
+	margin: 0 auto;
+}
+
+div#sidebar {
+	float:left;
+	position:relative;
+	top:0;
+	left:0;
+	width: 20%;
+}
+
+div#main {
+	position: relative;
+	top:0;
+}
+
+div.jmap {
+	width: 400px;
+	height: 400px;
+	margin: 0 auto;
+}
+
+div.jmap-small-left {
+	width: 400px;
+	height: 400px;
+	float:left;
+	margin-right: 20px;
+}
+
+div#control-panel {
+	float:left;
+}
